@@ -12,26 +12,30 @@ var svg = d3.select('body')
 //  - nodes are known by 'id', not by index in array.
 //  - reflexive edges are indicated on the node (as a bold black circle).
 //  - links are always source < target; edge directions are set by 'left' and 'right'.
-var nodes      = [
-        {id: 0},
-        {id: 1},
-        {id: 2}
+var nodes       = [
+        {id: 0, title: 'Die Wurzel allen Bösen'},
+        {id: 1, parent: 0, title: 'Kriege'},
+        {id: 2, parent: 0, title: 'Politik'},
+        {id: 3, parent: 2, title: 'Korruption'},
+        {id: 4, parent: 2, title: 'Mafia'},
+        {id: 5, parent: 2, title: 'Vetternwirtschaft'}
     ],
-    lastNodeId = 2,
-    links      = [
-        {source: nodes[0], target: nodes[1]},
-        {source: nodes[1], target: nodes[2]}
-    ];
+    activeNodes = getActiveNodes(),
+    lastNodeId  = nodes.length,
+    links       = generateLinks(nodes),
+    activeLinks = generateLinks(activeNodes);
 
 // init D3 force layout
 var force = d3.layout.force()
-    .nodes(nodes)
-    .links(links)
+    .nodes(activeNodes)
+    .links(activeLinks)
     .size([width, height])
     .linkDistance(50)
     .charge(-3000)
+    .linkStrength(0.8)
     .on('tick', tick)
 
+/*
 // define arrow markers for graph links
 svg.append('svg:defs').append('svg:marker')
     .attr('id', 'end-arrow')
@@ -54,6 +58,7 @@ svg.append('svg:defs').append('svg:marker')
     .append('svg:path')
     .attr('d', 'M10,-5L0,0L10,5')
     .attr('fill', '#000');
+*/
 
 // line displayed when dragging new nodes
 var drag_line = svg.append('svg:path')
@@ -70,7 +75,10 @@ var selected_node  = null,
     mousedown_link = null,
     mousedown_node = null,
     mouseover_node = null,
-    mouseup_node   = null;
+    mouseup_node   = null,
+    active_nodes   = null,
+    active_links   = null,
+    active_root_id = null;
 
 function resetMouseVars() {
     findNode(mousedown_node.id).clicked = false;
@@ -91,6 +99,54 @@ function findNode(id) {
         if (nodes[i].id === id)
             return nodes[i];
     }
+}
+
+/**
+ * Generate links by nodes object
+ * @params nodes
+ * @returns {Array}
+ */
+
+function generateLinks(n) {
+    if (!n.length) return;
+
+    var newLinks = [];
+
+    for (var i = 0; i < n.length; i++) {
+        if (n[i].parent > -1) {
+            newLinks.push({
+                source: findNode(n[i].parent),
+                target: findNode(n[i].id)
+            });
+        }
+
+    }
+
+    return newLinks;
+}
+
+function getActiveNodes() {
+    if(active_root_id !== null) active_root_id = nodes[0].id;
+
+    console.log(active_root_id);
+
+    var newActiveNodes = [];
+
+    for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].parent == active_root_id || nodes[i].id == active_root_id) {
+            //console.log(nodes[i]);
+            newActiveNodes.push(nodes[i]);
+        }
+    }
+
+    return newActiveNodes;
+}
+
+//console.log(getActiveNodes());
+
+function getActiveLinks() {
+
+n
 }
 
 // update force layout (called automatically each iteration)
@@ -116,7 +172,9 @@ function tick() {
     });
 }
 
-// update graph (called when needed)
+/**
+ * Update graph (called when needed)
+ */
 function restart() {
     // path (link) group
     path = path.data(links);
@@ -157,7 +215,7 @@ function restart() {
 
     // circle (node) group
     // NB: the function arg is crucial here! nodes are known by id, not by index!
-    circle = circle.data(nodes, function (d) {
+    circle = circle.data(activeNodes, function (d) {
         return d.id;
     });
 
@@ -179,7 +237,7 @@ function restart() {
 
     g.append('svg:circle')
         .attr('class', 'node')
-        .attr('r', 12)
+        .attr('r', 10)
         .style('fill', function (d) {
             return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id);
         })
@@ -280,11 +338,20 @@ function restart() {
 
     // show node IDs
     g.append('svg:text')
-        .attr('x', 0)
+        .attr('x', -0.5)
         .attr('y', 4)
         .attr('class', 'id')
         .text(function (d) {
             return d.id;
+        });
+
+    // Show node titles
+    g.append('svg:text')
+        .attr('x', 10)
+        .attr('y', 20)
+        .attr('class', 'title')
+        .text(function (d) {
+            return d.title;
         });
 
     // remove old nodes
@@ -293,6 +360,10 @@ function restart() {
     // set the graph in motion
     force.start();
 }
+
+/**
+ * Triggering mouse click start
+ */
 
 function mousedown() {
     // prevent I-bar on drag
@@ -328,6 +399,10 @@ function mousedown() {
     restart();
 }
 
+/**
+ * Triggering mouse move
+ */
+
 function mousemove() {
     /*  if(!mousedown_node) return;
 
@@ -336,6 +411,10 @@ function mousemove() {
 
      restart();*/
 }
+
+/**
+ * Triggering mouse click end
+ */
 
 function mouseup() {
     /*  if(mousedown_node) {
