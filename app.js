@@ -18,7 +18,13 @@ var nodes       = [
         {id: 2, parent: 0, title: 'Politik'},
         {id: 3, parent: 2, title: 'Korruption'},
         {id: 4, parent: 2, title: 'Mafia'},
-        {id: 5, parent: 2, title: 'Vetternwirtschaft'}
+        {id: 5, parent: 4, title: 'Industrie'},
+        {id: 6, parent: 4, title: 'Drogen'},
+        {id: 7, parent: 4, title: 'Prostitution'},
+        {id: 8, parent: 7, title: 'Hamburg'},
+        {id: 9, parent: 7, title: 'Berlin'},
+        {id: 10, parent: 7, title: 'Hannover'},
+        {id: 11, parent: 2, title: 'Vetternwirtschaft'}
     ],
     activeNodes = getActiveNodes(),
     lastNodeId  = nodes.length,
@@ -89,10 +95,15 @@ function findNodesbyParentId(id) {
     // TODO: Get unActiveNodes = nodes - activeNodes
 
     for (var i = 0; i < nodes.length; i++) {
-        if (nodes[i].parent === id)
-            children.push(nodes[i]);
+        //console.log(nodes[i].parent + " / " + id);
+        if(nodes[i].parent > -1) {
+            //console.log(nodes[i].parent);
+            if (nodes[i].parent == id) {
+                children.push(nodes[i]);
+            }
+        }
     }
-
+    //console.log(children);
     return children;
 }
 
@@ -142,7 +153,10 @@ function getActiveNodes() {
     return newActiveNodes;
 }
 
-// update force layout (called automatically each iteration)
+/**
+ * Update force layout (called automatically each iteration)
+ */
+
 function tick() {
     // draw directed edges with proper padding from node centers
     path.attr('d', function (d) {
@@ -246,7 +260,7 @@ function restart() {
             d3.select(this).attr('transform', 'scale(1.5)')//.transition().duration('1000ms');
             mouseover_node = d;
             d.hovered = true;
-            console.log('mouseover');
+            //console.log('mouseover');
         })
         .on('mouseout', function (d) {
             if(!d.hovered) return;
@@ -254,7 +268,7 @@ function restart() {
             d3.select(this).attr('transform', '');
             mouseover_node = null;
             d.hovered = false;
-            console.log('mouseout');
+            //console.log('mouseout');
         })
         .on('mousedown', function (d) {
             d.clicked = true;
@@ -365,7 +379,7 @@ function mousedown() {
     // because :active only works in WebKit?
     //svg.classed('active', true);
 
-    //if (d3.event.ctrlKey || mousedown_node || mousedown_link) return;
+    //if (d3.event.ctrlKey) return;
 
     // insert new node at point
     /*var point = d3.mouse(this),
@@ -384,22 +398,23 @@ function mousedown() {
             node = {id: nodes.length, parent: mousedown_node.id};
             node.x = point[0];
             node.y = point[1];
-            nodes.push(node);
-            activeNodes.push(node);
-            activeLinks.push({source: findNode(node.parent), target: findNode(node.id)});
+            //nodes.push(node);
+            //activeNodes.push(node);
+            //activeLinks.push({source: findNode(node.parent), target: findNode(node.id)});
 
         var newNodes = findNodesbyParentId(mousedown_node.id);
 
         if (newNodes) {
-            /*for (var i = 0; i < newNodes.length; i++) {
-                newNodes[i].x = mousedown_node.x;
-                newNodes[i].y = mousedown_node.y;
-                nodes.push(newNodes[i]);
+            console.log(newNodes);
+            for (var i = 0; i < newNodes.length; i++) {
+                newNodes[i].x = point[0];
+                newNodes[i].y = point[1];
+                //nodes.push(newNodes[i]);
                 activeNodes.push(newNodes[i]);
                 activeLinks.push({source: findNode(mousedown_node.id), target: findNode(newNodes[i].id)});
-            }*/
+            }
             //nodes.push(newNodes[0]);
-            //activeNodes.push(node);
+            //activeNodes.push(newNodes[0]);
             //activeLinks.push({source: findNode(mousedown_node.id), target: findNode(newNodes[0].id)});
         }
 
@@ -450,7 +465,7 @@ function mouseup() {
     //console.log("svg mouseup" + mousedown_node);
     //console.log('svg mouseup');
     resetMouseVars();
-    console.log(mousedown_node);
+    //console.log(mousedown_node);
 }
 
 function spliceLinksForNode(node) {
