@@ -189,10 +189,7 @@ function restart() {
     // update existing links
     path.classed('selected', function (d) {
         return d === selected_link;
-    })
-    /*    .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
-     .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; });*/
-
+    });
 
     // add new links
     /**
@@ -203,8 +200,6 @@ function restart() {
         .classed('selected', function (d) {
             return d === selected_link;
         })
-        /*    .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
-         .style('marker-end', function(d) { return d.right ? 'url(#end-arrow)' : ''; })*/
         .on('mousedown', function (d) {
             //if (d3.event.ctrlKey) return;
 
@@ -274,73 +269,12 @@ function restart() {
             d.clicked = true;
             mousedown_node = d;
 
-
-            //console.log(d);
-            /*      if(d3.event.ctrlKey) return;
-
-             // select node
-             mousedown_node = d;
-             if(mousedown_node === selected_node) selected_node = null;
-             else selected_node = mousedown_node;
-             selected_link = null;
-
-             // reposition drag line
-             drag_line
-             .style('marker-end', 'url(#end-arrow)')
-             .classed('hidden', false)
-             .attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + mousedown_node.x + ',' + mousedown_node.y);
-
-             restart();*/
             //console.log('mousedown');
         })
         .on('mouseup', function (d) {
             d.clicked = false;
             mousedown_node = null;
             //console.log('mouseup');
-            /*      if(!mousedown_node) return;
-
-             // needed by FF
-             drag_line
-             .classed('hidden', true)
-             .style('marker-end', '');
-
-             // check for drag-to-self
-             mouseup_node = d;
-             if(mouseup_node === mousedown_node) { resetMouseVars(); return; }
-
-             // unenlarge target node
-             d3.select(this).attr('transform', '');
-
-             // add link to graph (update if exists)
-             // NB: links are strictly source < target; arrows separately specified by booleans
-             var source, target, direction;
-             if(mousedown_node.id < mouseup_node.id) {
-             source = mousedown_node;
-             target = mouseup_node;
-             direction = 'right';
-             } else {
-             source = mouseup_node;
-             target = mousedown_node;
-             direction = 'left';
-             }
-
-             var link;
-             link = links.filter(function(l) {
-             return (l.source === source && l.target === target);
-             })[0];
-
-             if(link) {
-             link[direction] = true;
-             } else {
-             link = {source: source, target: target, left: false, right: false};
-             link[direction] = true;
-             links.push(link);
-             }
-
-             // select new link
-             selected_link = link;
-             selected_node = null;
-             restart();*/
         });
 
     // show node IDs
@@ -373,24 +307,6 @@ function restart() {
  */
 
 function mousedown() {
-    // prevent I-bar on drag
-    //d3.event.preventDefault();
-
-    // because :active only works in WebKit?
-    //svg.classed('active', true);
-
-    //if (d3.event.ctrlKey) return;
-
-    // insert new node at point
-    /*var point = d3.mouse(this),
-        node = {id: ++lastNodeId, reflexive: false};
-    node.x = point[0];
-    node.y = point[1];
-    nodes.push(node);*/
-
-    /**
-     * Clicking node
-     */
 
     if (mousedown_node !== null) {
 
@@ -436,12 +352,7 @@ function mousedown() {
  */
 
 function mousemove() {
-    /*  if(!mousedown_node) return;
 
-     // update drag line
-     drag_line.attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
-
-     restart();*/
 }
 
 /**
@@ -449,21 +360,6 @@ function mousemove() {
  */
 
 function mouseup() {
-    /*  if(mousedown_node) {
-     // hide drag line
-     drag_line
-     .classed('hidden', true)
-     .style('marker-end', '');
-     }
-
-     // because :active only works in WebKit?
-     svg.classed('active', false);
-
-     // clear mouse event vars
-     resetMouseVars();*/
-
-    //console.log("svg mouseup" + mousedown_node);
-    //console.log('svg mouseup');
     resetMouseVars();
     //console.log(mousedown_node);
 }
@@ -481,71 +377,10 @@ function spliceLinksForNode(node) {
 var lastKeyDown = -1;
 
 function keydown() {
-    /*  d3.event.preventDefault();
 
-     if(lastKeyDown !== -1) return;
-     lastKeyDown = d3.event.keyCode;
-
-     // ctrl
-     if(d3.event.keyCode === 17) {
-     circle.call(force.drag);
-     svg.classed('ctrl', true);
-     }
-
-     if(!selected_node && !selected_link) return;
-     switch(d3.event.keyCode) {
-     case 8: // backspace
-     case 46: // delete
-     if(selected_node) {
-     nodes.splice(nodes.indexOf(selected_node), 1);
-     spliceLinksForNode(selected_node);
-     } else if(selected_link) {
-     links.splice(links.indexOf(selected_link), 1);
-     }
-     selected_link = null;
-     selected_node = null;
-     restart();
-     break;
-     case 66: // B
-     if(selected_link) {
-     // set link direction to both left and right
-     selected_link.left = true;
-     selected_link.right = true;
-     }
-     restart();
-     break;
-     case 76: // L
-     if(selected_link) {
-     // set link direction to left only
-     selected_link.left = true;
-     selected_link.right = false;
-     }
-     restart();
-     break;
-     case 82: // R
-     if(selected_node) {
-     // toggle node reflexivity
-     selected_node.reflexive = !selected_node.reflexive;
-     } else if(selected_link) {
-     // set link direction to right only
-     selected_link.left = false;
-     selected_link.right = true;
-     }
-     restart();
-     break;
-     }*/
 }
 
 function keyup() {
-    /*  lastKeyDown = -1;
-
-     // ctrl
-     if(d3.event.keyCode === 17) {
-     circle
-     .on('mousedown.drag', null)
-     .on('touchstart.drag', null);
-     svg.classed('ctrl', false);
-     }*/
 }
 
 // app starts here
