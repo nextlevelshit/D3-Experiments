@@ -1,8 +1,5 @@
-Click in the open space to **add a node**, drag from one node to another to **add an edge**.  
-Ctrl-drag a node to **move** the graph layout.  
-Click a node or an edge to **select** it.
+## Force-directed clickable nested nodes
 
-When a node is selected: **R** toggles reflexivity, **Delete** removes the node.  
-When an edge is selected: **L**(eft), **R**(ight), **B**(oth) change direction, **Delete** removes the edge.
+This experiment is based on [Mike Bostoks](//github.com/mbostock) beautiful [D3-Library](//d3js.org/) and inspirated by [Ross Kirslings](//github.com/rkirsling) [modal-logic playground](//rkirsling.github.io/modallogic/).
 
-To see this example as part of a larger project, check out [Modal Logic Playground](http://rkirsling.github.com/modallogic/)!
+I'd tried to creat an force-directed particle system without any specified links. Every node has only attributes like ```id```, ```parent``` and ```title```. The linking system is going to be extracted by the attributes of the nodes. So we're getting a hirachy from the interlinked parent nodes.
