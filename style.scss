@@ -1,0 +1,90 @@
+$color-background: #000102;
+$color-background-gradient: #082433;
+$color-node: #AEC5DB;
+$color-node-inner: #000102;
+$color-node-text: #AEC5DB;
+$color-link: #AEC5DB;
+
+body {
+  background: $color-background;
+//  padding: 20px;
+  font-family: 'Roboto Condensed', sans-serif;
+  height: 100%;
+  width: 100%;
+
+  .background {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 0;
+    background: radial-gradient(rgba($color-background-gradient, 0.5) 0%, rgba($color-background-gradient,0) 60%);
+
+    //&__top {    background: linear-gradient(to bottom,  rgba($color-background-gradient, 0.5) 0%,rgba($color-background-gradient,0) 20%); }
+    //&__right {  background: linear-gradient(to left,    rgba($color-background-gradient, 0.5) 0%,rgba($color-background-gradient,0) 20%); }
+    //&__bottom { background: linear-gradient(to top,     rgba($color-background-gradient, 0.5) 0%,rgba($color-background-gradient,0) 20%); }
+    //&__left {   background: linear-gradient(to right,   rgba($color-background-gradient, 0.5) 0%,rgba($color-background-gradient,0) 20%); }
+  }
+}
+
+svg {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 99%;
+}
+
+.anchorNode {
+  text {
+    /*fill: #555;*/
+    font-size: 12px;
+    fill: $color-node-text;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  circle {
+  }
+}
+
+circle {
+  &.node {
+//    fill: $color-node-inner;
+//    stroke: $color-node;
+//    stroke-width: 4px;
+    cursor: pointer;
+  }
+}
+
+path {
+  &.link {
+    stroke: rgba($color-link, 0.2);
+    stroke-width: 3px;
+  }
+}
+
+text {
+  font: 10px 'Roboto Condensed', sans-serif;
+  pointer-events: none;
+
+  &.id {
+    text-anchor: middle;
+    font-weight: 700;
+//    fill: $color-node-text;
+    fill: $color-background;
+  }
+
+  &.title {
+    fill: $color-node-text;
+//    stroke: $color-node-text;
+//    paint-order: stroke;
+//    stroke-width: 2px;
+//    stroke-linecap: butt;
+//    stroke-linejoin: miter;
+    font-weight: 700;
+    font: 12px 'Roboto Condensed', sans-serif;
+  }
+}
