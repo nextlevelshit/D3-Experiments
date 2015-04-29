@@ -33,13 +33,14 @@ var nodes       = [
 
 // init D3 force layout
 var force = d3.layout.force()
-    .nodes(nodes)
+    .nodes(activeNodes)
     .links(activeLinks)
     .size([width, height])
     .linkDistance(50)
     .charge(-1000)
+    .friction(0.5)
     //.linkStrength(0.8)
-    .on('tick', tick)
+    .on('tick', tick);
 
 // line displayed when dragging new nodes
 var drag_line = svg.append('svg:path')
@@ -51,14 +52,12 @@ var path   = svg.append('svg:g').selectAll('path'),
     circle = svg.append('svg:g').selectAll('g');
 
 // mouse event vars
-var selected_node  = null,
+var selected_node  = nodes[0],
     selected_link  = null,
     mousedown_link = null,
     mousedown_node = null,
     mouseover_node = null,
     mouseup_node   = null,
-    active_nodes   = null,
-    active_links   = null,
     active_root_id = null;
 
 function resetMouseVars() {
@@ -107,6 +106,19 @@ function findNodesbyParentId(id) {
     return children;
 }
 
+function findPathTo(id, path) {
+
+    if (!path) var path = [];
+
+    for (var i = 0; i < nodes.length; i++){
+        //if (nodes[i].parent == id) {
+        //    path.push(nodes[i].id);
+        //}
+    }
+
+    console.log(path);
+}
+
 /**
  * Generate links by nodes object
  * @params nodes
@@ -137,9 +149,11 @@ function generateLinks(n) {
  */
 
 function getActiveNodes() {
-    if(active_root_id !== null) active_root_id = nodes[0].id;
+    if(active_root_id !== null) {
+        active_root_id = nodes[0].id;
+    }
 
-    //console.log(active_root_id);
+    console.log(selected_node);
 
     var newActiveNodes = [];
 
@@ -207,7 +221,7 @@ function restart() {
             mousedown_link = d;
             if (mousedown_link === selected_link) selected_link = null;
             else selected_link = mousedown_link;
-            selected_node = null;
+            //selected_node = null;
             restart();
         });
 
@@ -218,16 +232,19 @@ function restart() {
     // circle (node) group
     // NB: the function arg is crucial here! nodes are known by id, not by index!
     circle = circle.data(activeNodes, function (d) {
+        //if (d.id != selected_node.parent && d.id != selected_node.id) return;
         return d.id;
     });
 
+    console.log(circle);
+
     // update existing nodes (reflexive & selected visual states)
     circle.selectAll('circle')
+        .attr('r', function (d){
+            return (d === selected_node) ? 15 : 10;
+        })
         .style('fill', function (d) {
             return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id);
-        })
-        .classed('reflexive', function (d) {
-            return d.reflexive;
         });
 
     /**
@@ -237,22 +254,23 @@ function restart() {
      */
     var g = circle.enter().append('svg:g');
 
+    console.log(selected_node);
+
     g.append('svg:circle')
         .attr('class', 'node')
-        .attr('r', 10)
+        .attr('r', function (d){
+            return (d.id == selected_node.id) ? 15 : 10;
+        })
         .style('fill', function (d) {
             return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id);
         })
         .style('stroke', function (d) {
             return d3.rgb(colors(d.id)).darker().toString();
         })
-        .classed('reflexive', function (d) {
-            return d.reflexive;
-        })
         .on('mouseover', function (d) {
             if (d.clicked) return;
             // Hovering node
-            d3.select(this).attr('transform', 'scale(1.5)')//.transition().duration('1000ms');
+            d3.select(this).attr('transform', 'scale(1.5)')//.transition('all').duration();
             mouseover_node = d;
             d.hovered = true;
             //console.log('mouseover');
@@ -268,7 +286,7 @@ function restart() {
         .on('mousedown', function (d) {
             d.clicked = true;
             mousedown_node = d;
-
+            selected_node = d;
             //console.log('mousedown');
         })
         .on('mouseup', function (d) {
@@ -310,6 +328,9 @@ function mousedown() {
 
     if (mousedown_node !== null) {
 
+        //activeNodes = [];
+        //activeLinks = [];
+
         var point = d3.mouse(this),
             node = {id: nodes.length, parent: mousedown_node.id};
             node.x = point[0];
@@ -318,13 +339,16 @@ function mousedown() {
             //activeNodes.push(node);
             //activeLinks.push({source: findNode(node.parent), target: findNode(node.id)});
 
-        var newNodes = findNodesbyParentId(mousedown_node.id);
+        var newNodes = findNodesbyParentId(mousedown_node.id),
+            startingPoint = {x: mousedown_node.px, y: mousedown_node.py};
 
         if (newNodes) {
-            console.log(newNodes);
+            //console.log(newNodes);
+            selected_node = mousedown_node;
+
             for (var i = 0; i < newNodes.length; i++) {
-                newNodes[i].x = point[0];
-                newNodes[i].y = point[1];
+                newNodes[i].x = startingPoint.x;
+                newNodes[i].y = startingPoint.y;
                 //nodes.push(newNodes[i]);
                 activeNodes.push(newNodes[i]);
                 activeLinks.push({source: findNode(mousedown_node.id), target: findNode(newNodes[i].id)});
@@ -334,6 +358,15 @@ function mousedown() {
             //activeLinks.push({source: findNode(mousedown_node.id), target: findNode(newNodes[0].id)});
         }
 
+        var pathNodes = findPathTo(mousedown_node.id);
+
+        if (pathNodes) {
+            for (var i = 0; i < pathNodes.length; i++) {
+                //activeNodes.push(pathNodes[i]);
+            }
+        }
+
+
         //console.log(newNodes);
 
 
@@ -342,7 +375,6 @@ function mousedown() {
         //console.log(nodes);
         //console.log("clicked on node");
     }
-
 
     restart();
 }
