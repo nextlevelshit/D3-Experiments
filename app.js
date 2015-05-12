@@ -1,3 +1,7 @@
+Array.prototype.diff = function(a) {
+    return this.filter(function(i) {return a.indexOf(i) < 0;});
+};
+
 // set up SVG for D3
 var width  = $("body").innerWidth(),
     height = $("body").innerHeight(),
@@ -13,18 +17,21 @@ var svg = d3.select('body')
 //  - reflexive edges are indicated on the node (as a bold black circle).
 //  - links are always source < target; edge directions are set by 'left' and 'right'.
 var nodes       = [
-        {id: 0, title: 'Die Wurzel allen Bösen'},
-        {id: 1, parent: 0, title: 'Kriege'},
-        {id: 2, parent: 0, title: 'Politik'},
-        {id: 3, parent: 2, title: 'Korruption'},
-        {id: 4, parent: 2, title: 'Mafia'},
-        {id: 5, parent: 4, title: 'Industrie'},
-        {id: 6, parent: 4, title: 'Drogen'},
-        {id: 7, parent: 4, title: 'Prostitution'},
-        {id: 8, parent: 7, title: 'Hamburg'},
-        {id: 9, parent: 7, title: 'Berlin'},
+        {id: 0, title: 'Datenbanken'},
+        {id: 1, parent: 0, title: 'Modelle'},
+        {id: 2, parent: 0, title: 'Geschichte'},
+        {id: 3, parent: 1, title: 'Relational'},
+        {id: 4, parent: 3, title: 'MySQL'},
+        {id: 5, parent: 3, title: 'PostgreSQL'},
+        {id: 6, parent: 3, title: 'MariaDB'},
+        {id: 7, parent: 1, title: 'Objektorientiert'},
+        {id: 8, parent: 1, title: 'Dokumentenbasiert'},
+        {id: 9, parent: 1, title: 'Graphendatenbanken'},
         {id: 10, parent: 7, title: 'Hannover'},
-        {id: 11, parent: 2, title: 'Vetternwirtschaft'}
+        {id: 11, parent: 2, title: 'Vetternwirtschaft'},
+        {id: 12, parent: 1, title: 'Irak'},
+        {id: 13, parent: 12, title: 'Erster Irak-Krieg'},
+        {id: 14, parent: 13, title: '19XX'}
     ],
     activeNodes = getActiveNodes(),
     lastNodeId  = nodes.length,
@@ -36,9 +43,9 @@ var force = d3.layout.force()
     .nodes(activeNodes)
     .links(activeLinks)
     .size([width, height])
-    .linkDistance(50)
+    .linkDistance(100)
     .charge(-1000)
-    .friction(0.5)
+    //.friction(0.5)
     //.linkStrength(0.8)
     .on('tick', tick);
 
@@ -77,7 +84,7 @@ function resetMouseVars() {
 
 function findNode(id) {
     for (var i = 0; i < nodes.length; i++) {
-        if (nodes[i].id === id)
+        if (nodes[i].id == id)
             return nodes[i];
     }
 }
@@ -106,17 +113,51 @@ function findNodesbyParentId(id) {
     return children;
 }
 
+/**
+ * Find active path node id's from node id to root node
+ * @param id
+ * @param path
+ * @returns {*}
+ */
+
 function findPathTo(id, path) {
 
-    if (!path) var path = [];
+    if (!path) var path = [id];
 
-    for (var i = 0; i < nodes.length; i++){
-        //if (nodes[i].parent == id) {
-        //    path.push(nodes[i].id);
-        //}
+    for (var i = 0; i < path.length; i++){
+        for (var j = 0; j < activeNodes.length; j++){
+            if (activeNodes[j].id == findNode(path[i]).parent) {
+                path.push(activeNodes[j].id);
+            }
+        }
     }
 
-    console.log(path);
+    return path;
+}
+
+/**
+ * Find path nodes
+ * @param id
+ * @param path
+ * @returns {*}
+ */
+
+function findPathNodesTo(node, path) {
+
+    if (!path) var path = [node];
+
+    for (var i = 0; i < path.length; i++){
+        for (var j = 0; j < activeNodes.length; j++){
+            if (activeNodes[j].id == findNode(path[i].id).parent) {
+                activeNodes[j].path = true;
+                path.push(activeNodes[j]);
+            } else {
+                activeNodes[j].path = false;
+            }
+        }
+    }
+
+    return path;
 }
 
 /**
@@ -153,7 +194,7 @@ function getActiveNodes() {
         active_root_id = nodes[0].id;
     }
 
-    console.log(selected_node);
+    //console.log(selected_node);
 
     var newActiveNodes = [];
 
@@ -205,7 +246,6 @@ function restart() {
         return d === selected_link;
     });
 
-    // add new links
     /**
      * Defining and adding links
      */
@@ -229,19 +269,26 @@ function restart() {
     path.exit().remove();
 
 
+    //console.log(activeNodes);
+    $("#activeNodes").html(activeNodes.length);
+    $("#activeLinks").html(activeLinks.length);
     // circle (node) group
     // NB: the function arg is crucial here! nodes are known by id, not by index!
     circle = circle.data(activeNodes, function (d) {
         //if (d.id != selected_node.parent && d.id != selected_node.id) return;
+        //console.log("active " + d.id);
         return d.id;
     });
 
-    console.log(circle);
+    //console.log(circle);
 
     // update existing nodes (reflexive & selected visual states)
     circle.selectAll('circle')
         .attr('r', function (d){
-            return (d === selected_node) ? 15 : 10;
+            return (d.path) ? 20 : 10;
+        })
+        .attr('class', function(d) {
+            return (d.path) ? "node path" : "node";
         })
         .style('fill', function (d) {
             return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id);
@@ -254,12 +301,13 @@ function restart() {
      */
     var g = circle.enter().append('svg:g');
 
-    console.log(selected_node);
+    //console.log(selected_node);
 
     g.append('svg:circle')
         .attr('class', 'node')
         .attr('r', function (d){
-            return (d.id == selected_node.id) ? 15 : 10;
+            console.log(d.id + " -> " + d.path);
+            return (d.path) ? 20 : 10;
         })
         .style('fill', function (d) {
             return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id);
@@ -328,52 +376,56 @@ function mousedown() {
 
     if (mousedown_node !== null) {
 
+        console.log("== mousedown ===============");
+
         //activeNodes = [];
         //activeLinks = [];
 
+        var pathNodes = findPathNodesTo(mousedown_node);
+
         var point = d3.mouse(this),
             node = {id: nodes.length, parent: mousedown_node.id};
-            node.x = point[0];
-            node.y = point[1];
-            //nodes.push(node);
-            //activeNodes.push(node);
-            //activeLinks.push({source: findNode(node.parent), target: findNode(node.id)});
+        node.x = point[0];
+        node.y = point[1];
 
         var newNodes = findNodesbyParentId(mousedown_node.id),
-            startingPoint = {x: mousedown_node.px, y: mousedown_node.py};
+            startingPoint = {x: mousedown_node.x, y: mousedown_node.y};
 
-        if (newNodes) {
-            //console.log(newNodes);
-            selected_node = mousedown_node;
-
-            for (var i = 0; i < newNodes.length; i++) {
-                newNodes[i].x = startingPoint.x;
-                newNodes[i].y = startingPoint.y;
-                //nodes.push(newNodes[i]);
-                activeNodes.push(newNodes[i]);
-                activeLinks.push({source: findNode(mousedown_node.id), target: findNode(newNodes[i].id)});
-            }
-            //nodes.push(newNodes[0]);
-            //activeNodes.push(newNodes[0]);
-            //activeLinks.push({source: findNode(mousedown_node.id), target: findNode(newNodes[0].id)});
+        for (var i = 0; i < pathNodes.length; i++) {
+            newNodes.push(pathNodes[i]);
+            pathNodes[i].path = true;
         }
 
-        var pathNodes = findPathTo(mousedown_node.id);
+        var removeNodes = activeNodes.diff(newNodes);
+        var addNodes = newNodes.diff(pathNodes).diff(activeNodes);
 
-        if (pathNodes) {
-            for (var i = 0; i < pathNodes.length; i++) {
-                //activeNodes.push(pathNodes[i]);
-            }
+        for (var i = 0; i < removeNodes.length; i++) {
+            removeNode(removeNodes[i].id);
         }
 
-
-        //console.log(newNodes);
-
+        /*for (var i = 0; i < addNodes.length; i++) {
 
 
+            addNodes[i].x = startingPoint.x;
+            addNodes[i].y = startingPoint.y;
+            activeNodes.push(addNodes[i]);
+            activeLinks.push({source: findNode(addNodes[i].parent), target: findNode(addNodes[i].id)});
+        }*/
 
-        //console.log(nodes);
-        //console.log("clicked on node");
+        $.each(addNodes, function() {
+            this.x = startingPoint.x;
+            this.y = startingPoint.y;
+            activeNodes.push(this);
+            activeLinks.push({source: findNode(this.parent), target: findNode(this.id)});
+
+            //$(document).w(1000);
+            // TODO: Find way do delay poping out new nodes
+        });
+
+
+        /**
+         * Check if node have to be removed
+         */
     }
 
     restart();
@@ -403,6 +455,37 @@ function spliceLinksForNode(node) {
     toSplice.map(function (l) {
         links.splice(links.indexOf(l), 1);
     });
+}
+
+/**
+ * Removing node and its links
+ * @param id
+ */
+
+function removeNode(id) {
+    var i = 0;
+    var n = findNode(id);
+
+    // Removing links
+
+    while (i < activeLinks.length) {
+        if ((activeLinks[i].source.id == id) || (activeLinks[i].target.id == id)) {
+            //console.log("Removing link from " + activeLinks[i].source.id + " to " + activeLinks[i].target.id);
+            activeLinks.splice(i, 1);
+        } else {
+            i++;
+        }
+    }
+
+    // Removing node
+
+    var index = n.index;
+    if (index !== undefined) {
+        console.log("Removing node " + id);
+        activeNodes.splice(index, 1);
+    }
+
+    restart();
 }
 
 // only respond once per keydown

@@ -26,6 +26,17 @@ body {
     //&__bottom { background: linear-gradient(to top,     rgba($color-background-gradient, 0.5) 0%,rgba($color-background-gradient,0) 20%); }
     //&__left {   background: linear-gradient(to right,   rgba($color-background-gradient, 0.5) 0%,rgba($color-background-gradient,0) 20%); }
   }
+
+  .stats {
+    margin: 0;
+    padding: 10px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 300px;
+    height: 200px;
+    background: rgba(255,255,255,0.2);
+  }
 }
 
 svg {
@@ -37,7 +48,7 @@ svg {
 
 .anchorNode {
   text {
-    /*fill: #555;*/
+//    fill: #555;
     font-size: 12px;
     fill: $color-node-text;
 
@@ -52,9 +63,9 @@ svg {
 
 circle {
   &.node {
-//    fill: $color-node-inner;
-//    stroke: $color-node;
-//    stroke-width: 4px;
+    fill: $color-node-inner;
+    stroke: $color-node;
+    stroke-width: 4px;
     cursor: pointer;
   }
 }
