@@ -1,5 +1,7 @@
-Array.prototype.diff = function(a) {
-    return this.filter(function(i) {return a.indexOf(i) < 0;});
+Array.prototype.diff = function (a) {
+    return this.filter(function (i) {
+        return a.indexOf(i) < 0;
+    });
 };
 
 // set up SVG for D3
@@ -17,24 +19,54 @@ var svg = d3.select('body')
 //  - reflexive edges are indicated on the node (as a bold black circle).
 //  - links are always source < target; edge directions are set by 'left' and 'right'.
 var nodes       = [
-        {id: 0, title: 'Datenbanken'},
-        {id: 1, parent: 0, title: 'Modelle'},
-        {id: 2, parent: 0, title: 'Geschichte'},
-        {id: 3, parent: 1, title: 'Relational'},
-        {id: 4, parent: 3, title: 'MySQL'},
-        {id: 5, parent: 3, title: 'PostgreSQL'},
-        {id: 6, parent: 3, title: 'MariaDB'},
-        {id: 7, parent: 1, title: 'Objektorientiert'},
-        {id: 8, parent: 1, title: 'Dokumentenbasiert'},
-        {id: 9, parent: 1, title: 'Graphendatenbanken'},
-        {id: 10, parent: 7, title: 'Hannover'},
-        {id: 11, parent: 2, title: 'Vetternwirtschaft'},
-        {id: 12, parent: 1, title: 'Irak'},
-        {id: 13, parent: 12, title: 'Erster Irak-Krieg'},
-        {id: 14, parent: 13, title: '19XX'}
+        {id: 0, title: 'Philosophie'},
+        {id: 1, parent: 0, title: 'Theoretische Philosophie'},
+        {id: 2, parent: 0, title: 'Praktische Philosophie'},
+        {id: 3, parent: 1, title: 'Metaphysik'},
+        {id: 4, parent: 1, title: 'Erkenntnistheorie'},
+        {id: 5, parent: 1, title: 'Philosophie des Geistes'},
+        {id: 6, parent: 1, title: 'Sprachphilosophie'},
+        {id: 7, parent: 2, title: 'Ethik'},
+        {id: 8, parent: 2, title: 'Moralphilosophie'},
+        {id: 9, parent: 7, title: 'Metaethik'},
+        {id: 10, parent: 3, title: 'Spezielle Methaphysik'},
+        {id: 11, parent: 4, title: 'Was ist Wissen?'},
+        {id: 12, parent: 7, title: 'Diskreptive Ethik'},
+        {id: 13, parent: 7, title: 'Normative Ethik'},
+        {id: 14, parent: 5, title: 'Dualismus'},
+        {id: 15, parent: 5, title: 'Materialismus'},
+        {id: 16, parent: 5, title: 'Kognitionswissenschaften'},
+        {id: 17, parent: 5, title: 'Monismus'},
+        {id: 18, parent: 0, title: 'Ästhetik'},
+        {id: 19, parent: 0, title: 'Antropologie'},
+        {id: 20, parent: 1, title: 'Wissenschaftstheorie'},
+        {id: 21, parent: 1, title: 'Logik'},
+        {id: 22, parent: 1, title: 'Philosophie der Mathematik'},
+        {id: 23, parent: 3, title: 'Allgemeine Methaphysik'},
+        {id: 24, parent: 10, title: 'Was ist der Mensch?'},
+        {id: 25, parent: 10, title: 'Gibt es ein göttliches Wesen?'},
+        {id: 26, parent: 10, title: 'Gibt es eine Seele?'},
+        {id: 27, parent: 10, title: 'Hat die Welt einen Anfang?'},
+        {id: 28, parent: 23, title: 'Was gibt es?'},
+        {id: 29, parent: 23, title: 'Was ist das Sein?'},
+        {id: 30, parent: 23, title: 'Was ist eine Zahl?'},
+        {id: 31, parent: 23, title: 'Was ist Zeit?'},
+        {id: 32, parent: 23, title: 'Was ist Raum?'},
+        {id: 33, parent: 23, title: 'Was ist ein Naturgesetz?'},
+        {id: 34, parent: 11, title: 'Was ist Wahrheit?'},
+        {id: 35, parent: 11, title: 'Was ist eine Überzeugung?'},
+        {id: 36, parent: 11, title: 'Was ist eine Rechtfertigung?'},
+        {id: 37, parent: 34, title: 'Korrespondenztheorie'},
+        {id: 38, parent: 34, title: 'Konsenstheorie'},
+        {id: 39, parent: 34, title: 'Kohärenztheorie'},
+        {id: 40, parent: 34, title: 'Defalationäre Theorie'},
+        {id: 41, parent: 34, title: 'Sema(n)tische Theorie'},
+        {id: 42, parent: 34, title: 'Epistemische Wahrheitstheorie'},
+        {id: 43, parent: 40, title: 'Redundanztheorie'},
+        {id: 44, parent: 40, title: 'Disquotationstheorie'}
     ],
     activeNodes = getActiveNodes(),
-    lastNodeId  = nodes.length,
+    //lastNodeId  = nodes.length,
     links       = generateLinks(nodes),
     activeLinks = generateLinks(activeNodes);
 
@@ -43,16 +75,16 @@ var force = d3.layout.force()
     .nodes(activeNodes)
     .links(activeLinks)
     .size([width, height])
-    .linkDistance(100)
-    .charge(-1000)
-    //.friction(0.5)
-    //.linkStrength(0.8)
+    .linkDistance(80)
+    .charge(-1600)
+    .friction(0.9)
+    .linkStrength(0.6)
     .on('tick', tick);
 
 // line displayed when dragging new nodes
-var drag_line = svg.append('svg:path')
+/*var drag_line = svg.append('svg:path')
     .attr('class', 'link dragline hidden')
-    .attr('d', 'M0,0L0,0');
+    .attr('d', 'M0,0L0,0');*/
 
 // handles to link and node element groups
 var path   = svg.append('svg:g').selectAll('path'),
@@ -65,10 +97,10 @@ var selected_node  = nodes[0],
     mousedown_node = null,
     mouseover_node = null,
     mouseup_node   = null,
-    active_root_id = null;
+    rootNode = null;
 
 function resetMouseVars() {
-    if(mousedown_node !==null)
+    if (mousedown_node !== null)
         findNode(mousedown_node.id).clicked = false;
 
     mousedown_node = null;
@@ -100,14 +132,22 @@ function findNodesbyParentId(id) {
 
     // TODO: Get unActiveNodes = nodes - activeNodes
 
-    for (var i = 0; i < nodes.length; i++) {
+    //var unActiveNodes = nodes.diff(activeNodes);
+    var unActiveNodes = nodes;
+
+    console.log("unActiveNodes:");
+    console.log(nodes.diff(activeNodes));
+
+    for (var i = 0; i < unActiveNodes.length; i++) {
         //console.log(nodes[i].parent + " / " + id);
-        if(nodes[i].parent > -1) {
+        if (unActiveNodes[i].parent > -1) {
             //console.log(nodes[i].parent);
-            if (nodes[i].parent == id) {
-                children.push(nodes[i]);
+            if (unActiveNodes[i].parent == id) {
+                children.push(unActiveNodes[i]);
+                //console.log(unActiveNodes[i]);
             }
         }
+
     }
     //console.log(children);
     return children;
@@ -124,8 +164,8 @@ function findPathTo(id, path) {
 
     if (!path) var path = [id];
 
-    for (var i = 0; i < path.length; i++){
-        for (var j = 0; j < activeNodes.length; j++){
+    for (var i = 0; i < path.length; i++) {
+        for (var j = 0; j < activeNodes.length; j++) {
             if (activeNodes[j].id == findNode(path[i]).parent) {
                 path.push(activeNodes[j].id);
             }
@@ -142,12 +182,12 @@ function findPathTo(id, path) {
  * @returns {*}
  */
 
-function findPathNodesTo(node, path) {
+function findPathNodesTo(node) {
 
-    if (!path) var path = [node];
+    var path = [node];
 
-    for (var i = 0; i < path.length; i++){
-        for (var j = 0; j < activeNodes.length; j++){
+    for (var i = 0; i < path.length; i++) {
+        for (var j = 0; j < activeNodes.length; j++) {
             if (activeNodes[j].id == findNode(path[i].id).parent) {
                 activeNodes[j].path = true;
                 path.push(activeNodes[j]);
@@ -158,6 +198,24 @@ function findPathNodesTo(node, path) {
     }
 
     return path;
+}
+
+/**
+ * Get all direct children of a node
+ * @param node
+ * @returns {Array}
+ */
+
+function getChildren(node) {
+    var children = [];
+
+    $.each(nodes, function(){
+        if (this.parent == node.id) {
+            children.push(this);
+        }
+    });
+
+    return children;
 }
 
 /**
@@ -190,8 +248,8 @@ function generateLinks(n) {
  */
 
 function getActiveNodes() {
-    if(active_root_id !== null) {
-        active_root_id = nodes[0].id;
+    if (!rootNode) {
+        rootNode = nodes[0].id;
     }
 
     //console.log(selected_node);
@@ -199,7 +257,7 @@ function getActiveNodes() {
     var newActiveNodes = [];
 
     for (var i = 0; i < nodes.length; i++) {
-        if (nodes[i].parent == active_root_id || nodes[i].id == active_root_id) {
+        if (nodes[i].parent == rootNode || nodes[i].id == rootNode) {
             //console.log(nodes[i]);
             newActiveNodes.push(nodes[i]);
         }
@@ -227,11 +285,19 @@ function tick() {
             targetX = d.target.x - (targetPadding * normX),
             targetY = d.target.y - (targetPadding * normY);
         return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
+    }).attr('class', function (d) {
+        return (d.source.path) ? 'path' : 'link';
     });
 
-    circle.attr('transform', function (d) {
-        return 'translate(' + d.x + ',' + d.y + ')';
-    });
+    circle
+        .attr('transform', function (d) {
+            return 'translate(' + d.x + ',' + d.y + ')';
+        })
+        .attr('class', function(d) {
+            //console.log(d.path);
+            return (d.path === true) ? 'entity trail' : 'entity';
+        });
+
 }
 
 /**
@@ -247,23 +313,32 @@ function restart() {
     });
 
     /**
+     * LINKS ===================
      * Defining and adding links
+     * @type {*|void}
      */
     path.enter().append('svg:path')
-        .attr('class', 'link')
+        .attr('class', 'link'/*function (d) {
+            //console.log(d.source.id + " (" + d.source.path + ") -- " + d.target.path + " (" + d.source.path + ")");
+
+            //return (d.source.path === true) ? 'path' : 'link';
+        }*/)
+        .attr('stroke-width', function(d){
+            return (getChildren(d.target).length + 1);
+        })
         .classed('selected', function (d) {
             return d === selected_link;
         })
-        .on('mousedown', function (d) {
-            //if (d3.event.ctrlKey) return;
+        /*.on('mousedown', function (d) {
+         //if (d3.event.ctrlKey) return;
 
-            // select link
-            mousedown_link = d;
-            if (mousedown_link === selected_link) selected_link = null;
-            else selected_link = mousedown_link;
-            //selected_node = null;
-            restart();
-        });
+         // select link
+         mousedown_link = d;
+         if (mousedown_link === selected_link) selected_link = null;
+         else selected_link = mousedown_link;
+         //selected_node = null;
+         restart();
+         })*/;
 
     // remove old links
     path.exit().remove();
@@ -284,72 +359,89 @@ function restart() {
 
     // update existing nodes (reflexive & selected visual states)
     circle.selectAll('circle')
-        .attr('r', function (d){
-            return (d.path) ? 20 : 10;
+        .attr('r', function (d) {
+            return (d.path) ? 12 : 8;
         })
-        .attr('class', function(d) {
+        .attr('class', function (d) {
             return (d.path) ? "node path" : "node";
         })
-        .style('fill', function (d) {
-            return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id);
-        });
+        /*.style('fill', function (d) {
+         return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id);
+         })*/;
 
     /**
      * NODES ===================
      * Defining and adding nodes
      * @type {*|void}
      */
-    var g = circle.enter().append('svg:g');
+    //var g = circle.enter().append('svg:g').on('mouseover', function (d) {alert('#')});
+    var g = circle.enter().append('svg:g').attr('class', 'entity');
+
+    //console.log(g);
 
     //console.log(selected_node);
 
     g.append('svg:circle')
         .attr('class', 'node')
-        .attr('r', function (d){
-            console.log(d.id + " -> " + d.path);
-            return (d.path) ? 20 : 10;
+        .attr('r', function (d) {
+            //console.log(d.id + " -> " + d.path);
+            console.log("==" + d.title + " " + d.path);
+            return (d.path) ? 12 : 8;
         })
-        .style('fill', function (d) {
-            return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id);
-        })
-        .style('stroke', function (d) {
-            return d3.rgb(colors(d.id)).darker().toString();
-        })
+        /*.style('fill', function (d) {
+         return (d === selected_node) ? d3.rgb(colors(d.id)).brighter().toString() : colors(d.id);
+         })
+         .style('stroke', function (d) {
+         return d3.rgb(colors(d.id)).darker().toString();
+         })*/
         .on('mouseover', function (d) {
             if (d.clicked) return;
             // Hovering node
-            d3.select(this).attr('transform', 'scale(1.5)')//.transition('all').duration();
+            d3.select(this).attr('transform', function (d) {
+                //return (d.path) ? 'scale(0.8)' : 'scale(1.5)';
+            });//.transition('all').duration();
             mouseover_node = d;
             d.hovered = true;
             //console.log('mouseover');
         })
         .on('mouseout', function (d) {
-            if(!d.hovered) return;
+            if (!d.hovered) return;
             // Unhovering node
             d3.select(this).attr('transform', '');
             mouseover_node = null;
             d.hovered = false;
             //console.log('mouseout');
         })
-        .on('mousedown', function (d) {
-            d.clicked = true;
-            mousedown_node = d;
-            selected_node = d;
-            //console.log('mousedown');
-        })
         .on('mouseup', function (d) {
             d.clicked = false;
             mousedown_node = null;
             //console.log('mouseup');
+        })
+        .on('mousedown', function (d) {
+            //d.attr('w', 0);
+            d.clicked = true;
+            mousedown_node = d;
+            selected_node = d;
+            //console.log('mousedown');
         });
 
     // show node IDs
+    /*g.append('svg:text')
+     .attr('x', -0.5)
+     .attr('y', 4)
+     .attr('class', 'id')
+     .text(function (d) {
+     return d.id;
+     });*/
+
+
+    // Show shadows of node titles
     g.append('svg:text')
-        .attr('x', -0.5)
-        .attr('y', 4)
-        .attr('class', 'id')
+        .attr('x', 12)
+        .attr('y', 22)
+        .attr('class', 'shadow')
         .text(function (d) {
-            return d.id;
+            return d.title;
         });
 
     // Show node titles
@@ -360,6 +452,8 @@ function restart() {
         .text(function (d) {
             return d.title;
         });
+
+
 
     // remove old nodes
     circle.exit().remove();
@@ -392,34 +486,69 @@ function mousedown() {
             startingPoint = {x: mousedown_node.x, y: mousedown_node.y};
 
         for (var i = 0; i < pathNodes.length; i++) {
+            if(mousedown_node.id != pathNodes[i].id) pathNodes[i].path = true;
             newNodes.push(pathNodes[i]);
-            pathNodes[i].path = true;
         }
+
+        //console.log(findNodesbyParentId(mousedown_node.id).length);
+
+        // Open children nodes and remove quotes o non path nodes
+        //if(findNodesbyParentId(mousedown_node.id).length > 0) {
+
 
         var removeNodes = activeNodes.diff(newNodes);
         var addNodes = newNodes.diff(pathNodes).diff(activeNodes);
 
-        for (var i = 0; i < removeNodes.length; i++) {
-            removeNode(removeNodes[i].id);
+        if(findNodesbyParentId(mousedown_node.id).length > 0) {
+            for (var i = 0; i < removeNodes.length; i++) {
+                removeNode(removeNodes[i].id);
+            }
         }
 
         /*for (var i = 0; i < addNodes.length; i++) {
 
 
-            addNodes[i].x = startingPoint.x;
-            addNodes[i].y = startingPoint.y;
-            activeNodes.push(addNodes[i]);
-            activeLinks.push({source: findNode(addNodes[i].parent), target: findNode(addNodes[i].id)});
-        }*/
+         addNodes[i].x = startingPoint.x;
+         addNodes[i].y = startingPoint.y;
+         activeNodes.push(addNodes[i]);
+         activeLinks.push({source: findNode(addNodes[i].parent), target: findNode(addNodes[i].id)});
+         }*/
 
-        $.each(addNodes, function() {
-            this.x = startingPoint.x;
-            this.y = startingPoint.y;
-            activeNodes.push(this);
-            activeLinks.push({source: findNode(this.parent), target: findNode(this.id)});
+        /*$.each(addNodes, function() {
+         this.x = startingPoint.x;
+         this.y = startingPoint.y;
+         activeNodes.push(this);
+         activeLinks.push({source: findNode(this.parent), target: findNode(this.id)});
 
-            //$(document).w(1000);
-            // TODO: Find way do delay poping out new nodes
+         //$.delay(1000).restart();
+         restart();
+
+         // TODO: Find a smoother way do delay popping out new nodes
+         });*/
+
+        /*$.each(addNodes, function() {
+         this.x = startingPoint.x;
+         this.y = startingPoint.y;
+         activeNodes.push(this);
+         activeLinks.push({source: findNode(this.parent), target: findNode(this.id)});
+
+         //$.delay(1000).restart();
+         restart();
+
+         // TODO: Find a smoother way do delay popping out new nodes
+         });*/
+
+        $(addNodes).each($).wait(100, function (index) {
+
+            addNodes[index].x = startingPoint.x;
+            addNodes[index].y = startingPoint.y;
+            activeNodes.push(addNodes[index]);
+            activeLinks.push({source: findNode(addNodes[index].parent), target: findNode(addNodes[index].id)});
+
+            console.log("Adding node: " + addNodes[index].id);
+            //$.delay(1000).restart();
+            restart();
+
         });
 
 
@@ -428,7 +557,7 @@ function mousedown() {
          */
     }
 
-    restart();
+
 }
 
 /**

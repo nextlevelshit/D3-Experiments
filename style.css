@@ -1,6 +1,6 @@
 body {
   background: #000102;
-  font-family: 'Roboto Condensed', sans-serif;
+  font-family: 'Marvel', sans-serif;
   height: 100%;
   width: 100%; }
   body .background {
@@ -18,7 +18,7 @@ body {
     left: 0;
     top: 0;
     width: 300px;
-    height: 400px;
+    height: 200px;
     background: rgba(255, 255, 255, 0.2); }
 
 svg {
@@ -27,30 +27,81 @@ svg {
   width: 100%;
   height: 99%; }
 
-.anchorNode text {
-  /*fill: #555;*/
-  font-size: 12px;
-  fill: #AEC5DB; }
-  .anchorNode text:hover {
-    cursor: pointer; }
+g {
+  /*.anchorNode {
+    text {
+  //    fill: #555;
+      font-size: 12px;
+      fill: $color-node-text;
 
-circle.node {
-  cursor: pointer; }
+      &:hover {
+        cursor: pointer;
+      }
+    }
 
-path.link {
-  stroke: rgba(174, 197, 219, 0.2);
-  stroke-width: 3px; }
-
-text {
-  font: 10px 'Roboto Condensed', sans-serif;
-  pointer-events: none; }
-  text.id {
-    text-anchor: middle;
-    font-weight: 700;
-    fill: #000102; }
-  text.title {
-    fill: #AEC5DB;
-    font-weight: 700;
-    font: 12px 'Roboto Condensed', sans-serif; }
+    circle {
+    }
+  }*/ }
+  g.entity {
+    /**
+     * TRAILS: node, text
+     */ }
+    g.entity circle {
+      cursor: pointer;
+      /*&.path {
+        fill: $color-node-inner;
+        stroke: $color-node-path;
+        stroke-width: 4px;
+      }*/ }
+      g.entity circle.node {
+        fill: #000102;
+        stroke: #AEC5DB;
+        stroke-width: 4px; }
+      g.entity circle.root {
+        fill: #AEC5DB;
+        stroke: #AEC5DB;
+        stroke-width: 4px; }
+    g.entity text {
+      font: 13px 'Marvel', sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      pointer-events: none;
+      transition: all ease 100ms;
+      letter-spacing: 3px;
+      /*&.id {
+        text-anchor: middle;
+        font-weight: 700;
+        //    fill: $color-node-text;
+        fill: white;
+      }*/ }
+      g.entity text.title {
+        fill: #AEC5DB; }
+      g.entity text.shadow {
+        fill: #000102; }
+    g.entity.trail circle, g.entity.trail text {
+      opacity: 0.1; }
+    g.entity.trail circle {
+      fill: #000102;
+      stroke: white;
+      stroke-width: 4px;
+      opacity: 0.1; }
+    g.entity.trail text.title {
+      fill: white; }
+    g.entity.trail:hover circle, g.entity.trail:hover text {
+      opacity: 0.8; }
+    g.entity:hover circle {
+      stroke: #FFFFFF;
+      stroke-width: 8px; }
+    g.entity:hover text.title {
+      fill: #FFFFFF; }
+    g.entity:active circle {
+      stroke-width: 4px; }
+  g path.link {
+    stroke: rgba(174, 197, 219, 0.1);
+    stroke-dashoffset: dotted; }
+  g path.path {
+    stroke: white;
+    opacity: 0.1;
+    stroke-width: 1px; }
 
 /*# sourceMappingURL=style.css.map */
