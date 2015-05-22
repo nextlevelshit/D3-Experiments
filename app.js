@@ -18,6 +18,26 @@ var svg = d3.select('body')
 //  - nodes are known by 'id', not by index in array.
 //  - reflexive edges are indicated on the node (as a bold black circle).
 //  - links are always source < target; edge directions are set by 'left' and 'right'.
+
+$.ajax({
+    url: 'http://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmnamespace=14&cmlimit=100&cmtitle=Category:Philosophy&format=json',
+    dataType: 'json',
+    cache: false,
+    success: function( data, status ){
+        alert('radi');
+        alert(JSON.stringify(data));
+
+        alert( data.responseData.results.length + ' results found!' );
+    },
+    error: function(xhr, textStatus, err) { //odstampaj textStatus, err jbt
+        alert('ne radi');
+        alert(textStatus);
+        alert(err);
+        alert("readyState: "+xhr.readyState+"\n xhrStatus: "+xhr.status);
+        alert("responseText: "+xhr.responseText);
+    }
+});
+
 var nodes       = [
         {id: 0, title: 'Philosophie'},
         {id: 1, parent: 0, title: 'Theoretische Philosophie'},
