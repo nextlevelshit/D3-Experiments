@@ -61,6 +61,9 @@ g {
         fill: #AEC5DB;
         stroke: #AEC5DB;
         stroke-width: 4px; }
+      g.entity circle.transparent {
+        fill: transparent !important;
+        stroke: transparent !important; }
     g.entity text {
       font: 13px 'Marvel', sans-serif;
       font-weight: 700;
@@ -78,17 +81,21 @@ g {
         fill: #AEC5DB; }
       g.entity text.shadow {
         fill: #000102; }
-    g.entity.trail circle, g.entity.trail text {
-      opacity: 0.1; }
-    g.entity.trail circle {
-      fill: #000102;
-      stroke: white;
-      stroke-width: 4px;
-      opacity: 0.1; }
-    g.entity.trail text.title {
-      fill: white; }
-    g.entity.trail:hover circle, g.entity.trail:hover text {
-      opacity: 0.8; }
+    g.entity.trail {
+      /*circle, text {
+        opacity: 0.2;
+      }*/ }
+      g.entity.trail circle {
+        fill: #000102;
+        stroke: white;
+        stroke-width: 4px;
+        opacity: 0.1; }
+      g.entity.trail text {
+        opacity: 0.6; }
+        g.entity.trail text.title {
+          fill: white; }
+      g.entity.trail:hover circle, g.entity.trail:hover text {
+        opacity: 0.8; }
     g.entity:hover circle {
       stroke: #FFFFFF;
       stroke-width: 8px; }
@@ -101,7 +108,7 @@ g {
     stroke-dashoffset: dotted; }
   g path.path {
     stroke: white;
-    opacity: 0.1;
-    stroke-width: 1px; }
+    stroke-width: 3px;
+    opacity: 0.1; }
 
 /*# sourceMappingURL=style.css.map */

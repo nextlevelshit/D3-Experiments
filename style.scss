@@ -86,6 +86,11 @@ g {
         stroke-width: 4px;
       }
 
+      &.transparent {
+        fill: transparent !important;
+        stroke: transparent !important;
+      }
+
       /*&.path {
         fill: $color-node-inner;
         stroke: $color-node-path;
@@ -125,9 +130,9 @@ g {
 
     &.trail {
 
-      circle, text {
-        opacity: 0.1;
-      }
+      /*circle, text {
+        opacity: 0.2;
+      }*/
 
       circle {
         fill: $color-node-inner;
@@ -137,6 +142,8 @@ g {
       }
 
       text {
+
+        opacity: 0.6;
 
         &.title {
           fill: $color-node-text-trail;
@@ -187,9 +194,10 @@ g {
 
     &.path {
       stroke: $color-link-trail;
+      stroke-width: 3px;
 
       opacity: 0.1;
-      stroke-width: 1px;
+//      stroke-width: 1px;
     }
   }
 

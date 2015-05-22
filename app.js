@@ -54,6 +54,7 @@ var nodes       = [
         {id: 32, parent: 23, title: 'Was ist Raum?'},
         {id: 33, parent: 23, title: 'Was ist ein Naturgesetz?'},
         {id: 34, parent: 11, title: 'Was ist Wahrheit?'},
+        {id: 34, parent: 11, title: 'Was ist Wahrheit?'},
         {id: 35, parent: 11, title: 'Was ist eine Überzeugung?'},
         {id: 36, parent: 11, title: 'Was ist eine Rechtfertigung?'},
         {id: 37, parent: 34, title: 'Korrespondenztheorie'},
@@ -68,18 +69,33 @@ var nodes       = [
     activeNodes = getActiveNodes(),
     //lastNodeId  = nodes.length,
     links       = generateLinks(nodes),
-    activeLinks = generateLinks(activeNodes);
+    activeLinks = generateLinks(activeNodes),
+    labelAnchors = [],
+    labelAnchorLinks = [];
 
 // init D3 force layout
 var force = d3.layout.force()
     .nodes(activeNodes)
     .links(activeLinks)
     .size([width, height])
-    .linkDistance(80)
+    .linkDistance(function(d){
+        //var length = 80;
+        //console.log();
+        return (d.source.path) ? 120 : 80;
+    })
     .charge(-1600)
     .friction(0.9)
     .linkStrength(0.6)
     .on('tick', tick);
+
+var force2 = d3.layout.force()
+    .nodes(labelAnchors)
+    .links(labelAnchorLinks)
+    .gravity(0)
+    .linkDistance(0)
+    .linkStrength(1)
+    .charge(-100)
+    .size([width, height]);
 
 // line displayed when dragging new nodes
 /*var drag_line = svg.append('svg:path')
@@ -271,6 +287,7 @@ function getActiveNodes() {
  */
 
 function tick() {
+
     // draw directed edges with proper padding from node centers
     path.attr('d', function (d) {
         var deltaX = d.target.x - d.source.x,
@@ -305,18 +322,20 @@ function tick() {
  */
 function restart() {
     // path (link) group
-    path = path.data(activeLinks);
+
 
     // update existing links
-    path.classed('selected', function (d) {
+   /* path.classed('selected', function (d) {
         return d === selected_link;
-    });
+    });*/
 
     /**
      * LINKS ===================
      * Defining and adding links
      * @type {*|void}
      */
+    path = path.data(activeLinks);
+
     path.enter().append('svg:path')
         .attr('class', 'link'/*function (d) {
             //console.log(d.source.id + " (" + d.source.path + ") -- " + d.target.path + " (" + d.source.path + ")");
@@ -324,11 +343,11 @@ function restart() {
             //return (d.source.path === true) ? 'path' : 'link';
         }*/)
         .attr('stroke-width', function(d){
-            return (getChildren(d.target).length + 1);
+            return (getChildren(d.target).length + 4);
         })
-        .classed('selected', function (d) {
+        /*.classed('selected', function (d) {
             return d === selected_link;
-        })
+        })*/
         /*.on('mousedown', function (d) {
          //if (d3.event.ctrlKey) return;
 
@@ -345,8 +364,8 @@ function restart() {
 
 
     //console.log(activeNodes);
-    $("#activeNodes").html(activeNodes.length);
-    $("#activeLinks").html(activeLinks.length);
+    //$("#activeNodes").html(activeNodes.length);
+    //$("#activeLinks").html(activeLinks.length);
     // circle (node) group
     // NB: the function arg is crucial here! nodes are known by id, not by index!
     circle = circle.data(activeNodes, function (d) {
@@ -375,11 +394,28 @@ function restart() {
      * @type {*|void}
      */
     //var g = circle.enter().append('svg:g').on('mouseover', function (d) {alert('#')});
-    var g = circle.enter().append('svg:g').attr('class', 'entity');
+    var g = circle.enter()
+        .append('svg:g')
+        .attr('class', 'entity')
+        .on('mousedown', function(d){
+            mousedown_node = d;
+            //mousedown(d);
+        });
+
+    //g.on('mouseover', function (d) {
+    //    console.log("=== HOVER" + d);
+    //});
 
     //console.log(g);
 
     //console.log(selected_node);
+
+    g.append('svg:circle')
+        .attr('class', 'transparent')
+        .attr('r', 20)
+        /*.on('mousedown', function (d) {
+            console.log("=== HOVER");
+        })*/;
 
     g.append('svg:circle')
         .attr('class', 'node')
@@ -417,13 +453,13 @@ function restart() {
             mousedown_node = null;
             //console.log('mouseup');
         })
-        .on('mousedown', function (d) {
+        /*.on('mousedown', function (d) {
             //d.attr('w', 0);
             d.clicked = true;
             mousedown_node = d;
             selected_node = d;
             //console.log('mousedown');
-        });
+        })*/;
 
     // show node IDs
     /*g.append('svg:text')
@@ -458,8 +494,100 @@ function restart() {
     // remove old nodes
     circle.exit().remove();
 
+
+    /** LABELS ======
+     *
+     */
+    var anchorLink = svg.selectAll("line.anchorLink").data(labelAnchorLinks)//.enter().append("svg:line").attr("class", "anchorLink").style("stroke", "#999");
+
+    var anchorNode = svg
+        .selectAll("g.anchorNode")
+        .data(force2.nodes())
+        .enter().append("svg:g")
+        .attr("class", "anchorNode");
+
+    anchorNode.append("svg:circle")
+        .attr("r", 0)
+        .style("fill", "#FFF");
+
+    anchorNode.append("svg:text")
+        .text(function (d, i) {
+            return i % 2 == 0 ? "" : d.node.label
+        });
+
     // set the graph in motion
     force.start();
+}
+
+orbit = force;
+
+//drawOrbit(activeNodes);
+
+function drawOrbit(_data) {
+
+    //down with category20a()!!
+    colors = d3.scale.category20b();
+
+    orbitScale = d3.scale.linear().domain([1, 3]).range([3.8, 1.5]).clamp(true);
+    radiusScale = d3.scale.linear().domain([0,1,2,3]).range([20,10,3,1]).clamp(true);
+
+
+    /*orbit = d3.layout.orbit().size([1000,1000])
+        .children(function(d) {return d.children})
+        .revolution(function(d) {return d.depth})
+        .orbitSize(function(d) {return orbitScale(d.depth)})
+        .speed(5)
+        .nodes(_data);*/
+    orbit.orbitSize(function(d) {return orbitScale(d.depth)}).speed(5);
+
+    d3.select("svg").selectAll("g.node").data(orbit.nodes())
+        .enter()
+        .append("g")
+        .attr("class", "node")
+        .attr("transform", function(d) {return "translate(" +d.x +"," + d.y+")"});
+    /* .on("mouseover", nodeOver)
+     .on("mouseout", nodeOut)*/
+
+    d3.selectAll("g.node")
+        .append("circle")
+        .attr("r", function(d) {return radiusScale(d.depth)})
+        .style("fill", function(d) {return colors(d.depth)});
+
+//  d3.select("svg").selectAll("circle.orbits")
+//  .data(orbit.orbitalRings())
+//  .enter()
+//  .insert("circle", "g")
+//  .attr("class", "ring")
+//  .attr("r", function(d) {return d.r})
+//  .attr("cx", function(d) {return d.x})
+//  .attr("cy", function(d) {return d.y})
+//  .style("fill", "none")
+//  .style("stroke", "black")
+//  .style("stroke-width", "1px")
+//  .style("stroke-opacity", .15)
+
+    /*orbit.on("tick", function() {
+        d3.selectAll("g.node")
+            .attr("transform", function(d) {return "translate(" +d.x +"," + d.y+")"});
+
+
+    });*/
+
+    //orbit.start();
+
+    /*function nodeOver(d) {
+     orbit.stop();
+     d3.select(this).append("text").text(d.name).style("text-anchor", "middle").attr("y", 35);
+     d3.select(this).select("circle").style("stroke", "black").style("stroke-width", 3);
+     }
+
+     function nodeOut() {
+     orbit.start();
+     d3.selectAll("text").remove();
+     d3.selectAll("g.node > circle").style("stroke", "none").style("stroke-width", 0);
+     }*/
+
+
 }
 
 /**
@@ -467,6 +595,8 @@ function restart() {
  */
 
 function mousedown() {
+
+    //var mousedown_node = clickedNode;
 
     if (mousedown_node !== null) {
 
@@ -544,6 +674,8 @@ function mousedown() {
             addNodes[index].y = startingPoint.y;
             activeNodes.push(addNodes[index]);
             activeLinks.push({source: findNode(addNodes[index].parent), target: findNode(addNodes[index].id)});
+
+
 
             console.log("Adding node: " + addNodes[index].id);
             //$.delay(1000).restart();
