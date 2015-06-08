@@ -1,6 +1,6 @@
 body {
   background: #000102;
-  font-family: 'Marvel', sans-serif;
+  font-family: "Marvel", sans-serif;
   height: 100%;
   width: 100%; }
   body .background {
@@ -110,5 +110,38 @@ g {
     stroke: white;
     stroke-width: 3px;
     opacity: 0.1; }
+
+/**
+ * FLEX BOX
+ **/
+.flex__container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%; }
+.flex__item {
+  max-width: 50%; }
+  .flex__item--top {
+    align-self: flex-start; }
+  .flex__item--bottom {
+    align-self: flex-end; }
+
+/**
+ * INPUTS
+ **/
+.input {
+  z-index: 10;
+  border: 3px solid #AEC5DB;
+  background: black;
+  color: #AEC5DB;
+  font-family: "Marvel", sans-serif;
+  font-size: 1.5em;
+  border-radius: 5px;
+  padding: 10px; }
+  .input--button {
+    background: #AEC5DB;
+    color: #000102;
+    font-weight: bold;
+    cursor: pointer; }
 
 /*# sourceMappingURL=style.css.map */
