@@ -10,11 +10,55 @@
 </head>
 
 <body>
-<div class="flex__container" id="search-container">
-    <div class="search flex__item flex__item--center flex__item--middle">
-        <input class="input input--search" type="text" name="category" value=""/>
-        <input class="input input--button" type="submit" value="Suchen" />
+
+<div class="fixed--top full-width panel">
+    <ul class="list list--vertical">
+        <li><h1 class="margin-off">hydrapedia</h1></li>
+        <li><span id="trail"></span></li>
+        <li><a href="javascript:toggleSearch();">Neue Suche</a></li>
+        <li><a href="#">Suche speichern</a></li>
+        <li>
+            <select id="language">
+                <option value="de">Deutsch</option>
+                <option value="en" selected>English</option>
+                <option value="es">Espanol</option>
+                <option value="pl">Polski</option>
+            </select>
+        </li>
+    </ul>
+</div>
+
+<!--<div class="fixed--left full-height panel">
+    <ul class="list list--horizontal">
+        <li><a href="#">Punkt 1</a></li>
+        <li><a href="#">Punkt 2</a></li>
+        <li><a href="#">Punkt 3</a></li>
+        <li><a href="#">Punkt 4</a></li>
+        <li><a href="#">Punkt 5</a></li>
+    </ul>
+</div>-->
+
+<div class="flex flex--stretch hidden" id="gui">
+    <div class="flex__item flex__item--left flex__item--width-1 panel hidden">
+        test
     </div>
+
+    <div class="flex__item flex__item--center flex__item--width-4" id="d3"></div>
+
+    <div class="flex__item flex__item--right flex__item--width-2 panel hidden">
+        test
+    </div>
+</div>
+
+<div class="flex flex--center">
+
+    <div class="search flex__item flex__item--center flex__item--middle" id="search-container">
+        <form action="" onsubmit="startSearch(); return false;">
+            <input class="input input--search" type="text" name="category" value=""/>
+            <input class="input input--button" type="submit" value="Suchen" />
+        </form>
+    </div>
+
 </div>
 <!--<div class="background"></div>-->
 

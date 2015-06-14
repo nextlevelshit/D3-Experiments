@@ -11,6 +11,10 @@ var hydra = {
 
     language: 'en',
 
+    setLanguage: function(newLanguage) {
+        this.language = newLanguage;
+    },
+
 
     // set up SVG for D3
     width: $("body").innerWidth(),
@@ -55,6 +59,7 @@ var hydra = {
 
         this.path.enter().append('svg:path')
             .attr('class', 'link')
+            .attr('stroke-dasharray', '5,5')
             .attr('stroke-width', function (d) {
                 return (this.getChildren(d.target).length + 4);
             }.bind(this));
@@ -462,8 +467,16 @@ var hydra = {
             }.bind(this));
 
             /**
-             * Check if node have to be removed
+             * Add trail to top panel
              */
+
+            var trailHtml = [];
+
+            pathNodes.each(function(){
+                trailHtml.push(this.title);
+            });
+
+            alert(trailHtml.join(' > '));
         }
 
 
@@ -536,16 +549,22 @@ var hydra = {
         this.mousedown_node = "pups";
     }*/
 
+    /*zoom: function() {
+        hydra.svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    },*/
 
     // app starts here
     init: function (category) {
 
         this.rootCategory = category;
 
-        this.svg = d3.select('body')
+        this.svg = d3.select('#d3')
             .append('svg')
             .attr('width', this.width)
-            .attr('height', this.height);
+            .attr('height', this.height)
+            /*.append("g")
+            .call(d3.behavior.zoom().scaleExtent([1, 8]).on("zoom", this.zoom).bind(this))
+            .append("g")*/;
 
         this.nodes = this.getStartingNodes();
         //this.nodes = this.getActiveNodes(this.nodes);
@@ -699,33 +718,33 @@ function drawOrbit(_data) {
     });
 }*/
 
-
-
-$("input[type=submit]").on('click', function () {
-
+function startSearch(){
     var category = $("input[name=category]").val();
 
     if (category.length > 0) {
         toggleSearch();
-        //init();
-
         hydra.init(category);
-
-        //hydra.setMousedown();
-        //hydra.mousedown_node = "paps";
-
-        //alert(hydra.mousedown_node);
     }
-});
+
+    return false;
+}
+
+
+/*$("input[type=submit]").on('click', function () {
+    startSearch();
+});*/
 
 function toggleSearch() {
     $('#search-container').toggle('slow', function () {
-        //toggleD3();
+        toggleGUI();
     });
 }
 
-function toggleD3() {
-    $('svg').toggle('slow', function () {
-        //
-    });
+function toggleGUI() {
+    $('#gui').toggleClass('hidden');
 }
+
+$('select#language').on('change', function(){
+    //alert($(this).val());
+    hydra.setLanguage($(this).val());
+});

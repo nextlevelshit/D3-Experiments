@@ -1,8 +1,9 @@
 $color-background: #000102;
 //$color-background-gradient: #082433;
 $color-background-gradient: #212A33;
-$color-node: #AEC5DB;
 $color-trail: white;
+
+$color-node: #AEC5DB;
 $color-node-inner: #000102;
 $color-node-trail: $color-trail;
 $color-node-text: #AEC5DB;
@@ -10,8 +11,13 @@ $color-node-text-trail: $color-trail;
 $color-node-text-hover: #FFFFFF;
 $color-node-page: #B70A00;
 $color-node-subcat: #AEC5DB;
+
 $color-link: #AEC5DB;
 $color-link-trail: $color-trail;
+
+$color-panel: #A3A875;
+$color-panel-dark: #8B8E6A;
+
 
 $main-font-family: 'Economica', sans-serif;
 
@@ -36,6 +42,7 @@ body {
   font-family: $main-font-family;
   height: 100%;
   width: 100%;
+  position: relative;
 
   .background {
     position: absolute;
@@ -70,6 +77,7 @@ svg {
   width: 100%;
   height: 99%;
 }
+
 g {
 
   /*.anchorNode {
@@ -264,15 +272,27 @@ g {
  **/
 
 .flex {
-  &__container {
-    display: flex;
+  display: flex;
+
+  &--stretch {
+    align-items: stretch;
+    height: 100%;
+  }
+
+  &--center {
     align-items: center;
     justify-content: center;
     height: 100%;
   }
 
   &__item {
-    max-width: 50%;
+    &--width {
+      &-1 {  flex: 1 }
+      &-2 {  flex: 2 }
+      &-3 {  flex: 3 }
+      &-4 {  flex: 4 }
+      &-5 {  flex: 5 }
+    }
 
     &--top {
       align-self: flex-start;
@@ -315,6 +335,89 @@ g {
 
 
   &--search {
+
+  }
+}
+
+/**
+ * HELPERS
+ **/
+
+.full {
+  &-width {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  &-height {
+    max-height: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}
+
+.margin {
+  &-off { margin: 0 !important; }
+}
+
+.hidden {
+  display: none;
+}
+
+.fixed {
+  &--top {
+//    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+  
+  &--left {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+  }
+}
+
+.list {
+  list-style-type: none;
+  margin: 0;
+
+  li {
+    a {
+      display: block;
+      padding: 6px 12px;
+    }
+  }
+
+  &--vertical {
+    li {
+      display: inline-block;
+    }
+  }
+
+  &-horizontal {
+    li {
+      display: block;
+    }
+  }
+}
+
+.panel {
+  $this-font-color: darken($color-panel-dark, 30);
+
+  background: $color-panel-dark;
+  color: $this-font-color;
+
+  a {
+    color: $this-font-color;
+  }
+
+
+
+  &--left {
 
   }
 }
