@@ -9,114 +9,67 @@ var hydra = {
     // Options
     rootCategory: '',
 
+    language: 'en',
+
 
     // set up SVG for D3
     width: $("body").innerWidth(),
+
+    getWidth: function() {
+        return this.width;
+    },
+
     height: $("body").innerHeight(),
 
-    svg: d3.select('body')
-        .append('svg')
-        .attr('width', this.width)
-        .attr('height', this.height),
+    getHeight: function() {
+        return this.height;
+    },
+
+    //test: this.width,
+
+
 
     //var orbit = force;
-
-    // app starts here
-    init: function (category) {
-        var that = this;
-
-        this.rootCategory = category;
-
-        this.nodes = this.getStartingNodes();
-        this.activeNodes = this.getActiveNodes(this.nodes);
-        //lastNodeId  = nodes.length,
-        this.links = this.generateLinks(this.nodes);
-        this.activeLinks = this.generateLinks(this.activeNodes);
-        this.labelAnchors = [];
-        this.labelAnchorLinks = [];
-
-        //console.log(this.nodes);
-
-        // init D3 force layout
-        this.force = d3.layout.force()
-            .nodes(this.activeNodes)
-            .links(this.activeLinks)
-            .size([this.width, this.height])
-            .linkDistance(function (d) {
-                //var length = 80;
-                //console.log();
-                return (d.source.path) ? 120 : 80;
-            })
-            .charge(-1600)
-            .friction(0.9)
-            .linkStrength(0.6)
-            .on('tick', this.tick);
-        /*
-         var force2 = d3.layout.force()
-         .nodes(labelAnchors)
-         .links(labelAnchorLinks)
-         .gravity(0)
-         .linkDistance(0)
-         .linkStrength(1)
-         .charge(-100)
-         .size([width, height]);
-         */
-
-        // handles to link and node element groups
-        this.path = this.svg.append('svg:g').selectAll('path');
-        this.circle = this.svg.append('svg:g').selectAll('g');
-
-        this.selected_node = this.rootNode;
-        this.selected_link = null;
-        this.mousedown_link = null;
-        this.mousedown_node = null;
-        this.mouseover_node = null;
-        this.mouseup_node = null;
-        this.rootNode = null;
-
-        this.svg.on('mousedown', this.mousedown(that))
-            .on('mousemove', this.mousemove)
-            .on('mouseup', this.mouseup);
-
-        d3.select(window)
-            .on('keydown', this.keydown)
-            .on('keyup', this.keyup);
-
-        this.restart();
-        },
 
     /**
      * Update graph (called when needed)
      */
     restart: function () {
 
-        console.log('restart');
+        //console.log('restart()');
+        //console.log(this);
 
-        var that = this;
+
+
+        var that = this,
+            width = this.width,
+            height = this.height,
+            nodes = this.nodes,
+            links = this.links;
         /**
          * LINKS ===================
          * Defining and adding links
          * @type {*|void}
          */
-        var path = this.path.data(this.activeLinks);
+        this.path = this.path.data(this.activeLinks);
 
-        path.enter().append('svg:path')
+        this.path.enter().append('svg:path')
             .attr('class', 'link')
             .attr('stroke-width', function (d) {
-                return (that.getChildren(d.target).length + 4);
-            });
+                return (this.getChildren(d.target).length + 4);
+            }.bind(this));
 
         // remove old links
-        path.exit().remove();
+        this.path.exit().remove();
 
         // circle (node) group
         // NB: the function arg is crucial here! nodes are known by id, not by index!
-        var circle = this.circle.data(this.activeNodes, function (d) {
+        this.circle = this.circle.data(this.activeNodes, function (d) {
             return d.id;
         });
 
         // update existing nodes (reflexive & selected visual states)
-        circle.selectAll('circle')
+        this.circle.selectAll('circle')
             .attr('r', function (d) {
                 return (d.path) ? 12 : 8;
             })
@@ -129,23 +82,23 @@ var hydra = {
          * Defining and adding nodes
          * @type {*|void}
          */
-        this.g = circle.enter()
+        var g = this.circle.enter()
             .append('svg:g')
             .attr('class', 'entity')
             .on('mousedown', function (d) {
-                that.mousedown_node = d;
-            });
+                this.mousedown_node = d;
+                //console.log(this);
+            }.bind(this));
 
-        this.g.append('svg:circle')
+        g.append('svg:circle')
             .attr('class', 'transparent')
             .attr('r', 20);
 
-        this.g.append('svg:circle')
+        g.append('svg:circle')
             .attr('class', 'node')
             .attr('r', function (d) {
                 return (d.path) ? 12 : 8;
             })
-
             .on('mouseover', function (d) {
                 if (d.clicked) return;
                 // Hovering node
@@ -164,11 +117,11 @@ var hydra = {
             })
             .on('mouseup', function (d) {
                 d.clicked = false;
-                that.mousedown_node = null;
-            });
+                this.mousedown_node = null;
+            }.bind(this));
 
         // Show shadows of node titles
-        this.g.append('svg:text')
+        g.append('svg:text')
             .attr('x', 12)
             .attr('y', 22)
             .attr('class', 'shadow')
@@ -177,7 +130,7 @@ var hydra = {
             });
 
         // Show node titles
-        this.g.append('svg:text')
+        g.append('svg:text')
             .attr('x', 10)
             .attr('y', 20)
             .attr('class', 'title')
@@ -187,12 +140,11 @@ var hydra = {
 
 
         // remove old nodes
-        circle.exit().remove();
+        this.circle.exit().remove();
 
 
         /** LABELS ======
          *
-         */
         var anchorLink = this.svg.selectAll("line.anchorLink").data(that.labelAnchorLinks)//.enter().append("svg:line").attr("class", "anchorLink").style("stroke", "#999");
 
         var anchorNode = this.svg
@@ -207,21 +159,22 @@ var hydra = {
 
         anchorNode.append("svg:text")
             .text(function (d, i) {
-                return i % 2 == 0 ? "" : d.node.label
+                //return i % 2 == 0 ? "" : d.node.label
             });
+         */
 
         // set the graph in motion
         this.force.start();
     },
-
-
     /**
      * Get categories by php proxy from wikipedia
      */
     getData : function (category, parent) {
 
+        //console.log('getData('+category+','+parent+')');
+
         var request = $.ajax({
-            url: 'json/getSubCategories.php?category=' + category,
+            url: 'json/getSubCategories.php?category=' + category + '&lang=' + this.language,
             type: 'GET',
             dataType: 'jsonp',
             async: false
@@ -229,7 +182,7 @@ var hydra = {
 
         if (request.statusText != 'OK') return false;
 
-        var response = JSON.parse(request.responseText.replace(/pageid/g, 'id').replace(/Category:/g, '')).query.categorymembers;
+        var response = JSON.parse(request.responseText);
 
         var result = [];
 
@@ -240,6 +193,9 @@ var hydra = {
             //
             result.push(this);
         });
+
+        //console.log('return');
+        //console.log(result);
 
         return result;
     },
@@ -273,15 +229,18 @@ var hydra = {
      * @returns {*}
      */
     findNodesbyParentId : function (id) {
+
+        console.log('findNodesbyParentId('+id+')');
+
         var children = [];
 
         // TODO: Get unActiveNodes = nodes - activeNodes
 
         //var unActiveNodes = nodes.diff(activeNodes);
-        var unActiveNodes = nodes;
+        var unActiveNodes = this.nodes;
 
-        console.log("unActiveNodes:");
-        console.log(nodes.diff(activeNodes));
+        //console.log("unActiveNodes:");
+        //console.log(this.nodes.diff(this.activeNodes));
 
         for (var i = 0; i < unActiveNodes.length; i++) {
             //console.log(nodes[i].parent + " / " + id);
@@ -294,7 +253,8 @@ var hydra = {
             }
 
         }
-        //console.log(children);
+        console.log('return');
+        console.log(children);
         return children;
     },
     /**
@@ -323,8 +283,9 @@ var hydra = {
      * @param path
      * @returns {*}
      */
-
     findPathNodesTo : function (node) {
+
+        console.log('findPathNodesTo()');
 
         var path = [node];
 
@@ -341,13 +302,11 @@ var hydra = {
 
         return path;
     },
-
     /**
      * Get all direct children of a node
      * @param node
      * @returns {Array}
      */
-
     getChildren : function (node) {
         var children = [];
 
@@ -443,61 +402,61 @@ var hydra = {
     /**
      * Triggering mouse click start
      */
-    mousedown : function (that) {
+    mousedown : function () {
 
         //var that = this;
 
-        //console.log(that);
+        console.log('mousedown()');
+        console.log(this.mousedown_node);
 
         if (this.mousedown_node !== null) {
 
-            console.log("== mousedown ===============");
+            var pathNodes = this.findPathNodesTo(this.mousedown_node);
 
-            //var pathNodes = findPathNodesTo(mousedown_node);
-
-            var point = d3.mouse(that),
-                node = {id: that.nodes.length, parent: that.mousedown_node.id};
+            //var point = d3.mouse(this),
+            //    node = {id: this.nodes.length, parent: this.mousedown_node.id};
             //node.x = point[0];
             //node.y = point[1];
 
-            console.log(that.mousedown_node);
-
             //console.log("new nodes:");
-            //console.log(getData(mousedown_node.title, mousedown_node.id));
+            //console.log(this.getData(this.mousedown_node.title, this.mousedown_node.id));
 
             //var newNodes = findNodesbyParentId(mousedown_node.id),
             var newNodes = this.getData(this.mousedown_node.title, this.mousedown_node.id),
                 startingPoint = {x: this.mousedown_node.x, y: this.mousedown_node.y};
 
-            /*for (var i = 0; i < pathNodes.length; i++) {
-             if(mousedown_node.id != pathNodes[i].id) pathNodes[i].path = true;
-             newNodes.push(pathNodes[i]);
-             }
+            for (var i = 0; i < pathNodes.length; i++) {
+                if(this.mousedown_node.id != pathNodes[i].id) pathNodes[i].path = true;
+                newNodes.push(pathNodes[i]);
+            }
 
-             var removeNodes = activeNodes.diff(newNodes);
-             var addNodes = newNodes.diff(pathNodes).diff(activeNodes);
+            var removeNodes = this.activeNodes.diff(newNodes);
+            var addNodes = newNodes.diff(pathNodes).diff(this.activeNodes);
 
-             if(findNodesbyParentId(mousedown_node.id).length > 0) {
-             for (var i = 0; i < removeNodes.length; i++) {
-             removeNode(removeNodes[i].id);
-             }
-             }*/
+            console.log("Removing nodes:");
+            console.log(this.findNodesbyParentId(this.mousedown_node.id).length);
+
+            if(this.findNodesbyParentId(this.mousedown_node.id).length > 0) {
+                for (var i = 0; i < removeNodes.length; i++) {
+                    this.removeNode(removeNodes[i].id);
+
+                }
+            }
 
             //$(addNodes).each($).wait(100, function (index) {
-            $(newNodes).each($).wait(100, function (index) {
+            $(addNodes).each($).wait(100, function (index) {
 
-                newNodes[index].x = startingPoint.x;
-                newNodes[index].y = startingPoint.y;
-                that.activeNodes.push(newNodes[index]);
+                addNodes[index].x = startingPoint.x;
+                addNodes[index].y = startingPoint.y;
+                this.activeNodes.push(addNodes[index]);
                 //console.log(newNodes[index]);
-                that.activeLinks.push({source: that.findNode(newNodes[index].parent), target: newNodes[index]});
+                this.activeLinks.push({source: this.findNode(addNodes[index].parent), target: addNodes[index]});
 
-                console.log("Adding node: " + newNodes[index].id);
+                console.log("Adding node: " + addNodes[index].id);
                 //$.delay(1000).restart();
-                that.restart();
+                this.restart();
 
-            });
-
+            }.bind(this));
 
             /**
              * Check if node have to be removed
@@ -523,8 +482,17 @@ var hydra = {
      * Update force layout (called automatically each iteration)
      */
     tick : function () {
+        //console.log('tick()');
+        var width = this.width,
+            height = this.height,
+            nodes = this.nodes,
+            links = this.links,
+            circle = this.circle,
+            path = this.path;
+        //console.log(path);
         // draw directed edges with proper padding from node centers
-        this.path.attr('d', function (d) {
+        path.attr('d', function (d) {
+            //console.log(d);
             var deltaX = d.target.x - d.source.x,
                 deltaY = d.target.y - d.source.y,
                 dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
@@ -538,10 +506,11 @@ var hydra = {
                 targetY = d.target.y - (targetPadding * normY);
             return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
         }).attr('class', function (d) {
+            //return (d.source.path) ? 'path' : (d.target.hovered) ? 'hovered' : 'link';
             return (d.source.path) ? 'path' : 'link';
         });
 
-        this.circle
+        circle
             .attr('transform', function (d) {
                 return 'translate(' + d.x + ',' + d.y + ')';
             })
@@ -559,6 +528,80 @@ var hydra = {
 /*    setMousedown : function () {
         this.mousedown_node = "pups";
     }*/
+
+
+    // app starts here
+    init: function (category) {
+
+        this.rootCategory = category;
+
+        this.svg = d3.select('body')
+            .append('svg')
+            .attr('width', this.width)
+            .attr('height', this.height);
+
+        this.nodes = this.getStartingNodes();
+        this.activeNodes = this.getActiveNodes(this.nodes);
+        //lastNodeId  = nodes.length,
+        this.links = this.generateLinks(this.nodes);
+        this.activeLinks = this.generateLinks(this.activeNodes);
+        this.labelAnchors = [];
+        this.labelAnchorLinks = [];
+        // handles to link and node element groups
+        this.path = this.svg.append('svg:g').selectAll('path');
+        this.circle = this.svg.append('svg:g').selectAll('g');
+        // Mouse events and triggers
+        this.selected_node = this.rootNode;
+        this.selected_link = null;
+        this.mousedown_link = null;
+        this.mousedown_node = null;
+        this.mouseover_node = null;
+        this.mouseup_node = null;
+        // Root Node
+        this.rootNode = null;
+
+        var that = this,
+            width = this.width,
+            height = this.height,
+            nodes = this.nodes,
+            links = this.links;
+
+
+        // init D3 force layout
+        this.force = d3.layout.force()
+            .nodes(this.activeNodes)
+            .links(this.activeLinks)
+            .size([this.width, this.height])
+            .linkDistance(function (d) {
+                //var length = 80;
+                //console.log();
+                return (d.source.path) ? 120 : 80;
+            })
+            .charge(-1600)
+            .friction(0.9)
+            .linkStrength(0.6)
+            .on('tick', this.tick.bind(this));
+        /*
+         var force2 = d3.layout.force()
+         .nodes(labelAnchors)
+         .links(labelAnchorLinks)
+         .gravity(0)
+         .linkDistance(0)
+         .linkStrength(1)
+         .charge(-100)
+         .size([width, height]);
+         */
+
+        this.svg.on('mousedown', this.mousedown.bind(this))
+            .on('mousemove', this.mousemove)
+            .on('mouseup', this.mouseup);
+
+        d3.select(window)
+            .on('keydown', this.keydown)
+            .on('keyup', this.keyup);
+
+        this.restart();
+    }
 };
 
 //drawOrbit(activeNodes);

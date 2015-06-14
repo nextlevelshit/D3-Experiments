@@ -1,6 +1,16 @@
+@font-face {
+  font-family: 'Economica';
+  font-style: normal;
+  font-weight: 400;
+  src: local("Economica"), local("Economica-Regular"), url(fonts/Economica_400.woff) format("woff"); }
+@font-face {
+  font-family: 'Economica';
+  font-style: normal;
+  font-weight: 700;
+  src: local("Economica Bold"), local("Economica-Bold"), url(fonts/Economica_700.woff) format("woff"); }
 body {
   background: #000102;
-  font-family: "Marvel", sans-serif;
+  font-family: "Economica", sans-serif;
   height: 100%;
   width: 100%; }
   body .background {
@@ -55,7 +65,7 @@ g {
       }*/ }
       g.entity circle.node {
         fill: #000102;
-        stroke: #AEC5DB;
+        stroke: rgba(174, 197, 219, 0.2);
         stroke-width: 4px; }
       g.entity circle.root {
         fill: #AEC5DB;
@@ -65,7 +75,7 @@ g {
         fill: transparent !important;
         stroke: transparent !important; }
     g.entity text {
-      font: 13px 'Marvel', sans-serif;
+      font: 13px "Economica", sans-serif;
       font-weight: 700;
       text-transform: uppercase;
       pointer-events: none;
@@ -97,15 +107,16 @@ g {
       g.entity.trail:hover circle, g.entity.trail:hover text {
         opacity: 0.8; }
     g.entity:hover circle {
-      stroke: #FFFFFF;
-      stroke-width: 8px; }
+      stroke: rgba(174, 197, 219, 0.6);
+      stroke-width: 2px; }
     g.entity:hover text.title {
       fill: #FFFFFF; }
     g.entity:active circle {
       stroke-width: 4px; }
   g path.link {
-    stroke: rgba(174, 197, 219, 0.1);
-    stroke-dashoffset: dotted; }
+    stroke: rgba(174, 197, 219, 0.1); }
+  g path .hovered {
+    stroke: rgba(174, 197, 219, 0.3); }
   g path.path {
     stroke: white;
     stroke-width: 3px;
@@ -134,7 +145,7 @@ g {
   border: 3px solid #AEC5DB;
   background: black;
   color: #AEC5DB;
-  font-family: "Marvel", sans-serif;
+  font-family: "Economica", sans-serif;
   font-size: 1.5em;
   border-radius: 5px;
   padding: 10px; }

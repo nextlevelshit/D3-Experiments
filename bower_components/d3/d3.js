@@ -6353,6 +6353,7 @@
       return force;
     };
     force.start = function() {
+        //console.log(size);
       var i, n = nodes.length, m = links.length, w = size[0], h = size[1], neighbors, o;
       for (i = 0; i < n; ++i) {
         (o = nodes[i]).index = i;

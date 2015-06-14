@@ -10,7 +10,21 @@ $color-node-text-hover: #FFFFFF;
 $color-link: #AEC5DB;
 $color-link-trail: $color-trail;
 
-$main-font-family: 'Marvel', sans-serif;
+$main-font-family: 'Economica', sans-serif;
+
+@font-face {
+  font-family: 'Economica';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Economica'), local('Economica-Regular'), url(fonts/Economica_400.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Economica';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Economica Bold'), local('Economica-Bold'), url(fonts/Economica_700.woff) format('woff');
+}
 
 body {
   background: $color-background;
@@ -78,7 +92,7 @@ g {
 
       &.node {
         fill: $color-node-inner;
-        stroke: $color-node;
+        stroke: rgba($color-node,0.2);
         stroke-width: 4px;
       }
 
@@ -102,7 +116,7 @@ g {
 
     text {
 //      font: 10px 'Roboto Condensed', sans-serif;
-      font: 13px 'Marvel', sans-serif;
+      font: 13px $main-font-family;
       font-weight: 700;
       text-transform: uppercase;
       pointer-events: none;
@@ -166,8 +180,8 @@ g {
     &:hover {
 
       circle {
-        stroke: $color-node-text-hover;
-        stroke-width: 8px;
+        stroke: rgba($color-node, 0.6);
+        stroke-width: 2px;
       }
 
       text {
@@ -190,8 +204,12 @@ g {
   path {
     &.link {
       stroke: rgba($color-link, 0.1);
-      stroke-dashoffset: dotted;
+//      stroke-dashoffset: dotted;
 //      stroke-width: 3px;
+    }
+
+    .hovered {
+      stroke: rgba($color-link, 0.3);
     }
 
     &.path {
