@@ -51,7 +51,7 @@ var hydra = {
          * Defining and adding links
          * @type {*|void}
          */
-        this.path = this.path.data(this.activeLinks);
+        this.path = this.path.data(this.links);
 
         this.path.enter().append('svg:path')
             .attr('class', 'link')
@@ -64,7 +64,7 @@ var hydra = {
 
         // circle (node) group
         // NB: the function arg is crucial here! nodes are known by id, not by index!
-        this.circle = this.circle.data(this.activeNodes, function (d) {
+        this.circle = this.circle.data(this.nodes, function (d) {
             return d.id;
         });
 
@@ -74,7 +74,8 @@ var hydra = {
                 return (d.path) ? 12 : 8;
             })
             .attr('class', function (d) {
-                return (d.path) ? "node path" : "node";
+                //return (d.path) ? "node path" : "node";
+                return 'node';
             });
 
         /**
@@ -238,9 +239,11 @@ var hydra = {
 
         //var unActiveNodes = nodes.diff(activeNodes);
         var unActiveNodes = this.nodes;
+        console.log('this.nodes = ');
+        console.log(this.nodes);
 
         //console.log("unActiveNodes:");
-        //console.log(this.nodes.diff(this.activeNodes));
+        //console.log(this.nodes.diff(this.nodes));
 
         for (var i = 0; i < unActiveNodes.length; i++) {
             //console.log(nodes[i].parent + " / " + id);
@@ -268,9 +271,9 @@ var hydra = {
         if (!path) var path = [id];
 
         for (var i = 0; i < path.length; i++) {
-            for (var j = 0; j < this.activeNodes.length; j++) {
-                if (this.activeNodes[j].id == this.findNode(path[i]).parent) {
-                    path.push(this.activeNodes[j].id);
+            for (var j = 0; j < this.nodes.length; j++) {
+                if (this.nodes[j].id == this.findNode(path[i]).parent) {
+                    path.push(this.nodes[j].id);
                 }
             }
         }
@@ -290,12 +293,12 @@ var hydra = {
         var path = [node];
 
         for (var i = 0; i < path.length; i++) {
-            for (var j = 0; j < this.activeNodes.length; j++) {
-                if (this.activeNodes[j].id == this.findNode(path[i].id).parent) {
-                    this.activeNodes[j].path = true;
-                    path.push(this.activeNodes[j]);
+            for (var j = 0; j < this.nodes.length; j++) {
+                if (this.nodes[j].id == this.findNode(path[i].id).parent) {
+                    this.nodes[j].path = true;
+                    path.push(this.nodes[j]);
                 } else {
-                    this.activeNodes[j].path = false;
+                    this.nodes[j].path = false;
                 }
             }
         }
@@ -371,9 +374,9 @@ var hydra = {
 
         // Removing links
 
-        while (i < this.activeLinks.length) {
-            if ((this.activeLinks[i].source.id == id) || (this.activeLinks[i].target.id == id)) {
-                this.activeLinks.splice(i, 1);
+        while (i < this.links.length) {
+            if ((this.links[i].source.id == id) || (this.links[i].target.id == id)) {
+                this.links.splice(i, 1);
             } else {
                 i++;
             }
@@ -383,7 +386,7 @@ var hydra = {
         var index = n.index;
         if (index !== undefined) {
             //console.log("Removing node " + id);
-            this.activeNodes.splice(index, 1);
+            this.nodes.splice(index, 1);
         }
 
         this.restart();
@@ -430,27 +433,27 @@ var hydra = {
                 newNodes.push(pathNodes[i]);
             }
 
-            var removeNodes = this.activeNodes.diff(newNodes);
-            var addNodes = newNodes.diff(pathNodes).diff(this.activeNodes);
+            var removeNodes = this.nodes.diff(newNodes);
+            var addNodes = newNodes.diff(pathNodes).diff(this.nodes);
 
             console.log("Removing nodes:");
             console.log(this.findNodesbyParentId(this.mousedown_node.id).length);
 
-            if(this.findNodesbyParentId(this.mousedown_node.id).length > 0) {
+            //if(this.findNodesbyParentId(this.mousedown_node.id).length > 0) {
                 for (var i = 0; i < removeNodes.length; i++) {
                     this.removeNode(removeNodes[i].id);
-
+                    this.restart();
                 }
-            }
+            //}
 
             //$(addNodes).each($).wait(100, function (index) {
             $(addNodes).each($).wait(100, function (index) {
 
                 addNodes[index].x = startingPoint.x;
                 addNodes[index].y = startingPoint.y;
-                this.activeNodes.push(addNodes[index]);
+                this.nodes.push(addNodes[index]);
                 //console.log(newNodes[index]);
-                this.activeLinks.push({source: this.findNode(addNodes[index].parent), target: addNodes[index]});
+                this.links.push({source: this.findNode(addNodes[index].parent), target: addNodes[index]});
 
                 console.log("Adding node: " + addNodes[index].id);
                 //$.delay(1000).restart();
@@ -516,7 +519,11 @@ var hydra = {
             })
             .attr('class', function (d) {
                 //console.log(d.path);
-                return (d.path === true) ? 'entity trail' : 'entity';
+                var newClasses = [];
+                newClasses.push('entity');
+                newClasses.push((d.path === true) ? 'trail' : '');
+                newClasses.push(d.type);
+                return newClasses.join(' ');
             });
 
     },
@@ -541,10 +548,10 @@ var hydra = {
             .attr('height', this.height);
 
         this.nodes = this.getStartingNodes();
-        this.activeNodes = this.getActiveNodes(this.nodes);
+        //this.nodes = this.getActiveNodes(this.nodes);
         //lastNodeId  = nodes.length,
         this.links = this.generateLinks(this.nodes);
-        this.activeLinks = this.generateLinks(this.activeNodes);
+        //this.links = this.generateLinks(this.nodes);
         this.labelAnchors = [];
         this.labelAnchorLinks = [];
         // handles to link and node element groups
@@ -569,8 +576,8 @@ var hydra = {
 
         // init D3 force layout
         this.force = d3.layout.force()
-            .nodes(this.activeNodes)
-            .links(this.activeLinks)
+            .nodes(this.nodes)
+            .links(this.links)
             .size([this.width, this.height])
             .linkDistance(function (d) {
                 //var length = 80;

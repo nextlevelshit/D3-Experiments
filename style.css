@@ -20,7 +20,7 @@ body {
     bottom: 0;
     left: 0;
     z-index: 0;
-    background: radial-gradient(rgba(8, 36, 51, 0.5) 0%, rgba(8, 36, 51, 0) 60%); }
+    background: radial-gradient(rgba(33, 42, 51, 0.5) 0%, rgba(33, 42, 51, 0) 60%); }
   body .stats {
     margin: 0;
     padding: 10px;
@@ -55,7 +55,13 @@ g {
   g.entity {
     /**
      * TRAILS: node, text
-     */ }
+     */
+    /**
+     * PAGES: node, text
+     */
+    /**
+    * SUBCATEGORIES: node, text
+    */ }
     g.entity circle {
       cursor: pointer;
       /*&.path {
@@ -91,6 +97,8 @@ g {
         fill: #AEC5DB; }
       g.entity text.shadow {
         fill: #000102; }
+    g.entity:active circle {
+      stroke-width: 4px; }
     g.entity.trail {
       /*circle, text {
         opacity: 0.2;
@@ -111,8 +119,10 @@ g {
       stroke-width: 2px; }
     g.entity:hover text.title {
       fill: #FFFFFF; }
-    g.entity:active circle {
-      stroke-width: 4px; }
+    g.entity.page circle.node {
+      stroke: rgba(183, 10, 0, 0.2); }
+    g.entity.subcat circle.node {
+      stroke: rgba(174, 197, 219, 0.2); }
   g path.link {
     stroke: rgba(174, 197, 219, 0.1); }
   g path .hovered {

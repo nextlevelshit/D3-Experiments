@@ -1,5 +1,6 @@
 $color-background: #000102;
-$color-background-gradient: #082433;
+//$color-background-gradient: #082433;
+$color-background-gradient: #212A33;
 $color-node: #AEC5DB;
 $color-trail: white;
 $color-node-inner: #000102;
@@ -7,6 +8,8 @@ $color-node-trail: $color-trail;
 $color-node-text: #AEC5DB;
 $color-node-text-trail: $color-trail;
 $color-node-text-hover: #FFFFFF;
+$color-node-page: #B70A00;
+$color-node-subcat: #AEC5DB;
 $color-link: #AEC5DB;
 $color-link-trail: $color-trail;
 
@@ -140,6 +143,12 @@ g {
       }
     }
 
+    &:active {
+      circle {
+        stroke-width: 4px;
+      }
+    }
+
     /**
      * TRAILS: node, text
      */
@@ -151,10 +160,12 @@ g {
       }*/
 
       circle {
-        fill: $color-node-inner;
-        stroke: $color-node-trail;
-        stroke-width: 4px;
-        opacity: 0.1;
+        &.node {
+          fill: $color-node-inner;
+          stroke: $color-node-trail;
+          stroke-width: 4px;
+          opacity: 0.1;
+        }
       }
 
       text {
@@ -194,9 +205,35 @@ g {
       }
     }
 
-    &:active {
+    /**
+     * PAGES: node, text
+     */
+
+    &.page {
       circle {
-        stroke-width: 4px;
+        &.node {
+          stroke: rgba($color-node-page, 0.2);
+        }
+      }
+      text {
+        &.title {
+          fill: $color-node-page;
+        }
+      }
+    }
+
+    /**
+    * SUBCATEGORIES: node, text
+    */
+
+    &.subcat {
+      circle {
+        &.node {
+          stroke: rgba($color-node-subcat, 0.2);
+        }
+      }
+      text {
+
       }
     }
   }
