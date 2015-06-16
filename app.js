@@ -18,20 +18,7 @@ var hydra = {
 
     // set up SVG for D3
     width: $("body").innerWidth(),
-
-    getWidth: function() {
-        return this.width;
-    },
-
     height: $("body").innerHeight(),
-
-    getHeight: function() {
-        return this.height;
-    },
-
-    //test: this.width,
-
-
 
     //var orbit = force;
 
@@ -204,6 +191,31 @@ var hydra = {
         //console.log(result);
 
         return result;
+    },
+    /**
+     * Get Abstract of an article from wikipedia proxy
+     * @param page
+     * @returns {*}
+     */
+    getAbstract : function (page) {
+
+        console.log('getData('+page+')');
+
+        var request = $.ajax({
+            url: 'json/getAbstract.php?page=' + page + '&lang=' + this.language,
+            type: 'GET',
+            dataType: 'jsonp',
+            async: false
+        });
+
+        if (request.statusText != 'OK') return false;
+
+        var response = JSON.parse(request.responseText).abstract;
+
+        console.log('return');
+        console.log(response);
+
+        return response;
     },
     /**
      * Generate first level children of the root node
@@ -412,73 +424,79 @@ var hydra = {
      */
     mousedown : function () {
 
-        //var that = this;
-
         console.log('mousedown()');
         console.log(this.mousedown_node);
 
-        if (this.mousedown_node !== null) {
+        hidePanel('right');
 
-            var pathNodes = this.findPathNodesTo(this.mousedown_node);
+        if (!this.mousedown_node) return;
 
-            //var point = d3.mouse(this),
-            //    node = {id: this.nodes.length, parent: this.mousedown_node.id};
-            //node.x = point[0];
-            //node.y = point[1];
+        if (this.mousedown_node.type == 'page') {
+            var title = this.mousedown_node.title;
+            var abstract = this.getAbstract(title);
 
-            //console.log("new nodes:");
-            //console.log(this.getData(this.mousedown_node.title, this.mousedown_node.id));
+            showAbstract(title, abstract);
 
-            //var newNodes = findNodesbyParentId(mousedown_node.id),
-            var newNodes = this.getData(this.mousedown_node.title, this.mousedown_node.id),
-                startingPoint = {x: this.mousedown_node.x, y: this.mousedown_node.y};
-
-            for (var i = 0; i < pathNodes.length; i++) {
-                if(this.mousedown_node.id != pathNodes[i].id) pathNodes[i].path = true;
-                newNodes.push(pathNodes[i]);
-            }
-
-            var removeNodes = this.nodes.diff(newNodes);
-            var addNodes = newNodes.diff(pathNodes).diff(this.nodes);
-
-            console.log("Removing nodes:");
-            console.log(this.findNodesbyParentId(this.mousedown_node.id).length);
-
-            //if(this.findNodesbyParentId(this.mousedown_node.id).length > 0) {
-                for (var i = 0; i < removeNodes.length; i++) {
-                    this.removeNode(removeNodes[i].id);
-                    this.restart();
-                }
-            //}
-
-            //$(addNodes).each($).wait(100, function (index) {
-            $(addNodes).each($).wait(100, function (index) {
-
-                addNodes[index].x = startingPoint.x;
-                addNodes[index].y = startingPoint.y;
-                this.nodes.push(addNodes[index]);
-                //console.log(newNodes[index]);
-                this.links.push({source: this.findNode(addNodes[index].parent), target: addNodes[index]});
-
-                console.log("Adding node: " + addNodes[index].id);
-                //$.delay(1000).restart();
-                this.restart();
-
-            }.bind(this));
-
-            /**
-             * Add trail to top panel
-             */
-
-            var trailHtml = [];
-
-            pathNodes.each(function(){
-                trailHtml.push(this.title);
-            });
-
-            alert(trailHtml.join(' > '));
+            return;
         }
 
+        var pathNodes = this.findPathNodesTo(this.mousedown_node);
+
+        //var point = d3.mouse(this),
+        //    node = {id: this.nodes.length, parent: this.mousedown_node.id};
+        //node.x = point[0];
+        //node.y = point[1];
+
+        //console.log("new nodes:");
+        //console.log(this.getData(this.mousedown_node.title, this.mousedown_node.id));
+
+        //var newNodes = findNodesbyParentId(mousedown_node.id),
+        var newNodes = this.getData(this.mousedown_node.title, this.mousedown_node.id),
+            startingPoint = {x: this.mousedown_node.x, y: this.mousedown_node.y};
+
+        for (var i = 0; i < pathNodes.length; i++) {
+            if(this.mousedown_node.id != pathNodes[i].id) pathNodes[i].path = true;
+            newNodes.push(pathNodes[i]);
+        }
+
+        var removeNodes = this.nodes.diff(newNodes);
+        var addNodes = newNodes.diff(pathNodes).diff(this.nodes);
+
+        console.log("Removing nodes:");
+        console.log(this.findNodesbyParentId(this.mousedown_node.id).length);
+
+        //if(this.findNodesbyParentId(this.mousedown_node.id).length > 0) {
+            for (var i = 0; i < removeNodes.length; i++) {
+                this.removeNode(removeNodes[i].id);
+                this.restart();
+            }
+        //}
+
+        $(addNodes).each($).wait(100, function (index) {
+
+            addNodes[index].x = startingPoint.x;
+            addNodes[index].y = startingPoint.y;
+            this.nodes.push(addNodes[index]);
+            //console.log(newNodes[index]);
+            this.links.push({source: this.findNode(addNodes[index].parent), target: addNodes[index]});
+
+            console.log("Adding node: " + addNodes[index].id);
+            //$.delay(1000).restart();
+            this.restart();
+
+        }.bind(this));
+
+        /**
+         * Add trail to top panel
+         */
+
+        var trailHtml = [];
+
+        pathNodes.each(function(){
+            trailHtml.push(this.title);
+        });
+
+        alert(trailHtml.join(' > '));
 
     },
     /**
@@ -742,6 +760,21 @@ function toggleSearch() {
 
 function toggleGUI() {
     $('#gui').toggleClass('hidden');
+}
+
+function togglePanel(side) {
+    $('#panel-'+side).toggleClass('hidden');
+}
+
+function hidePanel(side) {
+    if(!$('#panel-'+side).hasClass('hidden')) $('#panel-'+side).addClass('hidden');
+}
+
+function showAbstract(title, abstract) {
+    if($('#panel-right').hasClass('hidden')) togglePanel('right');
+
+    $('#panel-right-title').html(title);
+    $('#panel-right-content').html(abstract);
 }
 
 $('select#language').on('change', function(){
