@@ -1,22 +1,22 @@
 $color-background: #000102;
 //$color-background-gradient: #082433;
-$color-background-gradient: #212A33;
-$color-trail: white;
+$color-background-gradient: #202933;
+$color-trail: #EDFFFF;
 
-$color-node: #AEC5DB;
+$color-node: #8BE0C5;
 $color-node-inner: #000102;
 $color-node-trail: $color-trail;
-$color-node-text: #AEC5DB;
+$color-node-text: $color-node;
 $color-node-text-trail: $color-trail;
-$color-node-text-hover: #FFFFFF;
-$color-node-page: #B70A00;
-$color-node-subcat: #AEC5DB;
+$color-node-text-hover: #EDFFFF;
+$color-node-page: #ED1B5B;
+$color-node-subcat: $color-node;
 
-$color-link: #AEC5DB;
+$color-link: $color-node;
 $color-link-trail: $color-trail;
 
-$color-panel: #A3A875;
-$color-panel-dark: #8B8E6A;
+$color-panel: #EDFFFF;
+$color-panel-dark: #EDFFFF;
 
 
 $main-font-family: 'Economica', sans-serif;
@@ -357,6 +357,11 @@ g {
   }
 }
 
+.pull {
+  &-left { float: left; }
+  &-right { float: right; }
+}
+
 .margin {
   &-off { margin: 0 !important; }
 }
@@ -406,7 +411,7 @@ g {
 }
 
 .panel {
-  $this-font-color: darken($color-panel-dark, 30);
+  $this-font-color: $color-background;
 
   background: $color-panel-dark;
   color: $this-font-color;
@@ -414,8 +419,6 @@ g {
   a {
     color: $this-font-color;
   }
-
-
 
   &--left {
 

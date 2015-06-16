@@ -480,7 +480,7 @@ var hydra = {
             //console.log(newNodes[index]);
             this.links.push({source: this.findNode(addNodes[index].parent), target: addNodes[index]});
 
-            console.log("Adding node: " + addNodes[index].id);
+            //console.log("Adding node: " + addNodes[index].id);
             //$.delay(1000).restart();
             this.restart();
 
@@ -492,12 +492,11 @@ var hydra = {
 
         var trailHtml = [];
 
-        pathNodes.each(function(){
+        $.each(pathNodes, function(){
             trailHtml.push(this.title);
         });
 
-        alert(trailHtml.join(' > '));
-
+        updateTrail(trailHtml.reverse().join(' &raquo; '));
     },
     /**
      * Triggering mouse move
@@ -775,6 +774,10 @@ function showAbstract(title, abstract) {
 
     $('#panel-right-title').html(title);
     $('#panel-right-content').html(abstract);
+}
+
+function updateTrail(trail) {
+    $('#trail').html(trail);
 }
 
 $('select#language').on('change', function(){
