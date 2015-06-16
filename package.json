@@ -1,0 +1,16 @@
+{
+  "name": "d3_nested_nodes",
+  "version": "0.1.0",
+  "author": "Michael Czechowski",
+  "private": true,
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-cssmin": "*",
+    "grunt-contrib-sass": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-cssc": "*",
+    "grunt-htmlhint": "*",
+    "matchdep": "*"
+  }
+}

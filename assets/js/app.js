@@ -509,7 +509,7 @@ var hydra = {
      * Triggering mouse click end
      */
     mouseup : function () {
-        //this.resetMouseVars();
+        this.resetMouseVars();
         //console.log(mousedown_node);
     },
     /**

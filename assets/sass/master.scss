@@ -25,14 +25,14 @@ $main-font-family: 'Economica', sans-serif;
   font-family: 'Economica';
   font-style: normal;
   font-weight: 400;
-  src: local('Economica'), local('Economica-Regular'), url(fonts/Economica_400.woff) format('woff');
+  src: local('Economica'), local('Economica-Regular'), url(../../fonts/Economica_400.woff) format('woff');
 }
 
 @font-face {
   font-family: 'Economica';
   font-style: normal;
   font-weight: 700;
-  src: local('Economica Bold'), local('Economica-Bold'), url(fonts/Economica_700.woff) format('woff');
+  src: local('Economica Bold'), local('Economica-Bold'), url(../../fonts/Economica_700.woff) format('woff');
 }
 
 body {
